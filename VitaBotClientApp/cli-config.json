@@ -1,5 +1,5 @@
 {
 	"slate": {
-		"dev_command": "npm start"
+		"dev_command": "npm run dev -- --port %ZC_SLATE_PORT%"
 	}
 }
