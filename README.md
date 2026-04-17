@@ -1,26 +1,26 @@
 Auto deploy desconectado por el momento.
 
-para correr el proyecto:
+# Para correr el proyecto:
 
-git clone https://github.com/SantiBetancur/VitaBot_PY_20261.git
+### git clone https://github.com/SantiBetancur/VitaBot_PY_20261.git
 
-cd /VitaBot_PY_20261/
+### cd /VitaBot_PY_20261/
 
-Instalar el CLI de catalyst y el SDK de python
+# Instalar el CLI de catalyst y el SDK de python
 
-npm install -g zcatalyst-cli
-python3 -m pip install zcatalyst-sdk
+### npm install -g zcatalyst-cli
+### python3 -m pip install zcatalyst-sdk
 
-descargar dependencias para la aplicacion de slate react + vue
+# Descargar dependencias para la aplicacion de slate react + vue
 
-cd /VitaBotClientApp/
-npm install
-Iniciar el proyecto completo (slate app y funciones)
+### cd /VitaBotClientApp/
+### npm install
+# Iniciar el proyecto completo (slate app y funciones)
 
-catalyst serve
+#### catalyst serve
 
-Iniciar solo slate
+# Iniciar solo slate
 
-catalyst serve --only slate
+### catalyst serve --only slate
 
 
