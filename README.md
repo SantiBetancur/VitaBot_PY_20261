@@ -17,6 +17,10 @@ Auto deploy desconectado por el momento.
 ### npm install
 # Iniciar el proyecto completo (slate app y funciones)
 
+## IMPORTANTE: 
+### DEBEN CAMBIAR LA URL ESTÁTICA DE LA CONFIGURACIÓN DE SLATE EN EL ARCHIVO catalyst.json, la ruta que sale es: C:\\Users\\santi\\OneDrive\\Desktop\\PROYECTO DE PRACTICA\\VitaBotClientApp, deben cambiarla por la ruta local del archivo.
+
+
 #### catalyst serve
 
 # Iniciar solo slate

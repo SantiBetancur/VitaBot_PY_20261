@@ -1,0 +1,62 @@
+.item {
+  position: relative;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.12s;
+  outline: none;
+}
+
+.item:hover,
+.item:focus-visible {
+  background: var(--c-hover);
+}
+
+.item.active {
+  background: var(--c-active);
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--c-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 20px;
+  line-height: 1.4;
+}
+
+.meta {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--c-muted);
+  margin-top: 2px;
+}
+
+.deleteBtn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--c-muted);
+  padding: 4px;
+  border-radius: var(--radius-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.12s, color 0.12s;
+  cursor: pointer;
+}
+
+.item:hover .deleteBtn,
+.item:focus-within .deleteBtn {
+  opacity: 1;
+}
+
+.deleteBtn:hover {
+  color: var(--c-text);
+}

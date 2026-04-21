@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { useChatContext, ACTIONS } from '../context/ChatContext'
+import { useChatContext, ACTIONS } from '../context/Chatcontext'
 
 // ─── Config ───────────────────────────────────────────────────────────────
 const MODEL   = 'claude-sonnet-4-20250514'

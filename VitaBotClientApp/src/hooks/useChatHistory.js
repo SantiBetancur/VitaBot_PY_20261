@@ -1,4 +1,4 @@
-import { useChatContext } from '../context/ChatContext'
+import { useChatContext } from '../context/Chatcontext'
 
 /**
  * Exposes chat history state and actions for the Sidebar.

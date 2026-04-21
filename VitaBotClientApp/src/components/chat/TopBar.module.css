@@ -1,0 +1,28 @@
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px;
+  background: var(--c-surface);
+  border-bottom: 0.5px solid var(--c-border);
+}
+
+.title {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--c-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.badge {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--c-muted);
+  padding: 3px 9px;
+  border: 0.5px solid var(--c-border-md);
+  border-radius: 20px;
+  flex-shrink: 0;
+}

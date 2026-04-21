@@ -1,0 +1,55 @@
+.area {
+  padding: 14px 24px 20px;
+  background: var(--c-bg);
+}
+
+.wrapper {
+  max-width: 680px;
+  margin: 0 auto;
+  background: var(--c-accent);
+  border: 0.5px solid var(--c-border-md);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 10px 10px 10px 16px;
+  transition: border-color 0.15s;
+}
+
+.wrapper:focus-within {
+  border-color: var(--c-border-strong);
+}
+
+.textarea {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: none;
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--c-surface);
+  resize: none;
+  line-height: 1.55;
+  min-height: 22px;
+  max-height: 140px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.textarea::placeholder {
+  color: var(--c-surface);
+}
+
+.textarea:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.hint {
+  max-width: 680px;
+  margin: 6px auto 0;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--c-subtle);
+  text-align: center;
+}

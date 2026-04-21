@@ -1,0 +1,16 @@
+.area {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.inner {
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
