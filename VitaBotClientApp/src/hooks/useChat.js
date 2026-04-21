@@ -4,6 +4,7 @@ import { useChatContext, ACTIONS } from '../context/Chatcontext'
 // ─── Config ───────────────────────────────────────────────────────────────
 const MODEL   = 'claude-sonnet-4-20250514'
 const MAX_TOKENS = 1024
+const URL = "http://localhost:3000/server/vitabot_endpoint_function"
 
 // ─── useChat ──────────────────────────────────────────────────────────────
 /**
@@ -64,24 +65,33 @@ export function useChat() {
         { role: 'user', content: trimmed },
       ]
 
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      // const response = await fetch('https://api.anthropic.com/v1/messages', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({
+      //     model: MODEL,
+      //     max_tokens: MAX_TOKENS,
+      //     system: 'Eres un asistente amable, conciso y útil. Responde siempre en el idioma del usuario.',
+      //     messages,
+      //   }),
+      // })
+
+      const response = await fetch(`${URL}/message`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({
-          model: MODEL,
-          max_tokens: MAX_TOKENS,
-          system: 'Eres un asistente amable, conciso y útil. Responde siempre en el idioma del usuario.',
-          messages,
+          message: trimmed
         }),
       })
-
       if (!response.ok) {
         const err = await response.json().catch(() => ({}))
         throw new Error(err?.error?.message ?? `HTTP ${response.status}`)
       }
 
       const data = await response.json()
-      const aiText = data.content?.find(b => b.type === 'text')?.text ?? '(sin respuesta)'
+      console.log('API response:', data)
+      // const aiText = data.content?.find(b => b.type === 'botResponse')?.text ?? '(sin respuesta)'
+      const aiText = data.botResponse ?? '(sin respuesta)'
 
       const aiMessage = {
         id: `msg_${Date.now()}`,
