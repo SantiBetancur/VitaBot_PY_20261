@@ -10,6 +10,7 @@
 .item:hover,
 .item:focus-visible {
   background: var(--c-hover);
+  color: var(--c-surface);
 }
 
 .item.active {
@@ -31,6 +32,7 @@
   font-size: 11px;
   font-family: var(--font-mono);
   color: var(--c-muted);
+  font-weight: bold;
   margin-top: 2px;
 }
 

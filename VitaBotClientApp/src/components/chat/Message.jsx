@@ -1,4 +1,5 @@
 import styles from './Message.module.css'
+import ReactMarkdown from 'react-markdown'
 
 export default function Message({ message }) {
   const isUser = message.role === 'user'
@@ -10,7 +11,11 @@ export default function Message({ message }) {
         {isUser ? 'Tú' : 'AI'}
       </div>
       <div className={`${styles.bubble} ${isUser ? styles.bubbleUser : styles.bubbleAi} ${message.isError ? styles.error : ''}`}>
-        {message.content}
+        {isUser ? (
+          message.content
+        ) : (
+          <ReactMarkdown>{message.content}</ReactMarkdown>
+        )}
       </div>
     </div>
   )

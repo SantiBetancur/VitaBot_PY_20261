@@ -30,8 +30,8 @@
 }
 
 .avatarAi {
-  background: var(--c-text);
-  color: var(--c-surface);
+  background: var(--c-active);
+  color: var(--c-text);
 }
 
 .avatarUser {
@@ -64,7 +64,7 @@
 }
 
 .error {
-  background: #fef2f2;
+  background: var(--c-ai-bg);
   color: #b91c1c;
   border: 0.5px solid #fecaca;
 }

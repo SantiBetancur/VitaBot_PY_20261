@@ -2,6 +2,7 @@ import NewChatButton from '../Chat/NewchatButton'
 import HistoryList from '../Chat/HistoryList'
 import { useChatHistory } from '../../hooks/useChatHistory'
 import styles from './Sidebar.module.css'
+import logo from '../../assets/images/logo.png'
 
 export default function Sidebar() {
   const { chats, activeChatId, createChat, deleteChat, selectChat } = useChatHistory()
@@ -9,7 +10,9 @@ export default function Sidebar() {
   return (
     <aside className={styles.sidebar} aria-label="Panel lateral">
       <div className={styles.header}>
-        <span className={styles.logo}>Vita Bot</span>
+        <div className={styles.logo} aria-hidden="true">
+          <img src={logo} alt="Vita Bot" />
+        </div>
         <NewChatButton onClick={createChat} />
       </div>
 
@@ -23,7 +26,7 @@ export default function Sidebar() {
       />
 
       <div className={styles.footer}>
-        modelo · spark-2.1
+        modelo · Haiku-4.5
       </div>
     </aside>
   )

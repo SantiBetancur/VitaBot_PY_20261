@@ -16,12 +16,34 @@
   gap: 12px;
 }
 
+@keyframes shadowBorder {
+  0% {
+    box-shadow: 3px 3px 10px #070be4; /* abajo-derecha */
+  }
+  25% {
+    box-shadow: -3px 3px 10px #070be4; /* abajo-izquierda */
+  }
+  50% {
+    box-shadow: -3px -3px 10px #070be4; /* arriba-izquierda */
+  }
+  75% {
+    box-shadow: 3px -3px 10px #070be4; /* arriba-derecha */
+  }
+  100% {
+    box-shadow: 3px 3px 10px #070be4; /* vuelve a abajo-derecha */
+  }
+}
+
 .logo {
-  font-size: 18px;
-  font-weight: bolder;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--c-text);
+  background-color: var(--c-accent);
+  border-radius: var(--radius);
+  width: 100%;
+}
+.logo img {
+  width: 100%;
+  height: auto;
+  display: block;
+
 }
 
 .sectionLabel {

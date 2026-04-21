@@ -4,16 +4,19 @@
   flex-shrink: 0;
   border-radius: 7px;
   background: var(--c-accent);
-  color: var(--c-surface);
+  color: var(--c-active);
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.15s, transform 0.1s;
   cursor: pointer;
+  transition: ease-in 0.15s;
 }
 
 .btn:hover:not(:disabled) {
+  transition: ease-out 0.15s;
+  background: var(--c-active);
+  color: var(--c-accent);
   opacity: 0.78;
 }
 

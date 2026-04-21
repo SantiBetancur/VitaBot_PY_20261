@@ -11,34 +11,35 @@
   --font-mono:  'DM Mono', monospace;
 
   --sidebar-w:  224px;
-  --radius:     10px;
+  --radius:     20px;
   --radius-sm:  6px;
   --radius-xs:  4px;
 
   /* Surfaces */
-  --c-bg:       #2c2c2c;
+  --c-bg:       #252525;
   --c-surface:  #1f1f1f;
   --c-active:   #d40000;
-  --c-hover:    #505050;
+  --c-hover:    #313131;
 
   /* Borders */
-  --c-border:   rgba(255, 255, 255, 0.486);
-  --c-border-md: rgba(255, 255, 255, 0.466);
-  --c-border-strong: rgba(255, 255, 255, 0.863);
+  --c-border:   rgba(255, 255, 255, 0.425);
+  --c-border-md: rgba(255, 255, 255, 0.555);
+  --c-border-strong: #ffffffc0;
 
   /* Text */
   --c-text:     #f3f3f3;
-  --c-muted:    #d40000;
+  --c-muted:    #ffffff;
   --c-subtle:   #e6e6e6;
+  --c-textarea: rgb(71, 71, 71);
 
   /* Bubbles */
-  --c-user-bg:  #19191a;
-  --c-user-fg:  #f7f6f4;
-  --c-ai-bg:    #202020;
-  --c-ai-fg:    #202020;
+  --c-user-bg:  #313131;
+  --c-user-fg:  #cecece;
+  --c-ai-bg:    #313131;
+  --c-ai-fg:    #e7e7e7;
 
   /* Accent */
-  --c-accent:   #ffffff;
+  --c-accent:   #ffffffd0;
 }
 
 /* ─── Base ───────────────────────────────────────────────────────────────── */
