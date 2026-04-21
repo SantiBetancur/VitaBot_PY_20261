@@ -1,0 +1,71 @@
+/* ─── Reset ─────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ─── Design Tokens ──────────────────────────────────────────────────────── */
+:root {
+  --font-sans:  'DM Sans', sans-serif;
+  --font-mono:  'DM Mono', monospace;
+
+  --sidebar-w:  224px;
+  --radius:     10px;
+  --radius-sm:  6px;
+  --radius-xs:  4px;
+
+  /* Surfaces */
+  --c-bg:       #f7f6f4;
+  --c-surface:  #ffffff;
+  --c-active:   #edecea;
+  --c-hover:    #f2f1ef;
+
+  /* Borders */
+  --c-border:   rgba(0, 0, 0, 0.07);
+  --c-border-md: rgba(0, 0, 0, 0.13);
+  --c-border-strong: rgba(0, 0, 0, 0.22);
+
+  /* Text */
+  --c-text:     #19191a;
+  --c-muted:    #8a8a86;
+  --c-subtle:   #b5b5b0;
+
+  /* Bubbles */
+  --c-user-bg:  #19191a;
+  --c-user-fg:  #f7f6f4;
+  --c-ai-bg:    #f0efed;
+  --c-ai-fg:    #19191a;
+
+  /* Accent */
+  --c-accent:   #19191a;
+}
+
+/* ─── Base ───────────────────────────────────────────────────────────────── */
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--c-bg);
+  color: var(--c-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  font-family: var(--font-sans);
+  cursor: pointer;
+}
+
+textarea {
+  font-family: var(--font-sans);
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--c-border-md); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--c-border-strong); }
