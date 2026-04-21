@@ -1,1 +1,4 @@
 zcatalyst-sdk==1.2.0
+python-dotenv
+requests
+anthropic
