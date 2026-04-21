@@ -41,7 +41,7 @@
 
 /* Bubble */
 .bubble {
-  max-width: 76%;
+  max-width: 90%;
   padding: 10px 14px;
   font-size: 14px;
   font-weight: 300;
@@ -52,15 +52,18 @@
 }
 
 .bubbleAi {
-  background: var(--c-ai-bg);
+ 
   color: var(--c-ai-fg);
-  border-bottom-left-radius: 3px;
+  border-radius: 0;
+  border-top: 2px solid var(--c-active);
+  border-bottom: 2px solid var(--c-active);
 }
 
 .bubbleUser {
   background: var(--c-user-bg);
   color: var(--c-user-fg);
   border-bottom-right-radius: 3px;
+  max-width: 80%;
 }
 
 .error {

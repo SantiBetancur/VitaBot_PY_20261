@@ -6,10 +6,12 @@ export default function Message({ message }) {
 
   return (
     <div className={`${styles.message} ${isUser ? styles.user : styles.ai}`}>
+      {/*
       <div className={`${styles.avatar} ${isUser ? styles.avatarUser : styles.avatarAi}`}
            aria-hidden>
         {isUser ? 'Tú' : 'AI'}
       </div>
+      */}
       <div className={`${styles.bubble} ${isUser ? styles.bubbleUser : styles.bubbleAi} ${message.isError ? styles.error : ''}`}>
         {isUser ? (
           message.content

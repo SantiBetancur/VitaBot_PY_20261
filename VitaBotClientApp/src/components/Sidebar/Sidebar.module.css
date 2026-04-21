@@ -35,8 +35,7 @@
 }
 
 .logo {
-  background-color: var(--c-accent);
-  border-radius: var(--radius);
+
   width: 100%;
 }
 .logo img {
