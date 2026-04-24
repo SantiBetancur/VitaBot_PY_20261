@@ -1,5 +1,6 @@
 import NewChatButton from '../Chat/NewchatButton'
 import HistoryList from '../Chat/HistoryList'
+import ProfileButton from '../User/ProfileButton'
 import { useChatHistory } from '../../hooks/useChatHistory'
 import styles from './Sidebar.module.css'
 import logo from '../../assets/images/logo2.png'
@@ -26,7 +27,12 @@ export default function Sidebar() {
       />
 
       <div className={styles.footer}>
-        modelo · Haiku-4.5
+        <ProfileButton />
+        <hr />
+        <div className={styles.modelInfo}>
+          modelo · Haiku-4.5
+        </div>
+
       </div>
     </aside>
   )
