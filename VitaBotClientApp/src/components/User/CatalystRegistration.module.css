@@ -1,0 +1,109 @@
+.registrationContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.registrationHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.registrationTitle {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.registrationTitle span {
+  color: var(--c-active);
+}
+
+.registrationDescription {
+  margin: 0;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.registrationForm {
+  display: grid;
+  gap: 12px;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldGroup label {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.fieldGroup input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.primaryButton,
+.secondaryButton {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.primaryButton {
+  background-color: var(--c-active);
+  color: #fff;
+}
+
+.primaryButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.secondaryButton {
+  background-color: var(--c-surface);
+  color:var(--c-text);
+}
+
+.statusMessage {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+}
+
+.statusMessage.success {
+  background-color: #ecfdf5;
+  border: 1px solid #10b981;
+  color: #0f766e;
+}
+
+.statusMessage.error {
+  background-color: #fef2f2;
+  border: 1px solid #ef4444;
+  color: #b91c1c;
+}
+
+.loadingText {
+  color: #6b7280;
+}
