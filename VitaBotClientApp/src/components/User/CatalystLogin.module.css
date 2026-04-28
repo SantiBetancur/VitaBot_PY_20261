@@ -1,0 +1,163 @@
+.loginContainer {
+  width: 100%;
+  height: 560px;
+  padding: 5px;
+  position: relative;
+  border-radius: var(--radius);
+  border: 3px solid var(--c-surface);
+}
+
+.loadingIndicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: var(--c-text);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.loadingSpinner {
+  font-size: 24px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.loadingText {
+  font-size: 14px;
+  color: var(--c-muted);
+}
+
+.errorMessage {
+  background-color: rgba(212, 0, 0, 0.1);
+  border: 1px solid var(--c-active);
+  padding: 15px;
+  border-radius: var(--radius-sm);
+  color: var(--c-text);
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.errorTitle {
+  font-weight: bold;
+  color: var(--c-active);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.errorDescription {
+  color: var(--c-subtle);
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+.loginContent {
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--c-border);
+  overflow: hidden;
+}
+
+.loginContent.loading {
+  opacity: 0.3;
+}
+
+
+.loginTitle {
+  margin: 0 0 20px 0;
+  text-align: center;
+  color: var(--c-text);
+  font-size: 18px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+}
+
+
+#catalyst-login-iframe input,
+#catalyst-login-iframe textarea,
+#catalyst-login-iframe select {
+  background-color: var(--c-surface) !important;
+  border: 1px solid var(--c-border) !important;
+  border-radius: var(--radius-xs) !important;
+  color: var(--c-text) !important;
+  padding: 8px 12px !important;
+  font-size: 14px !important;
+}
+
+#catalyst-login-iframe input:focus,
+#catalyst-login-iframe textarea:focus,
+#catalyst-login-iframe select:focus {
+  outline: none !important;
+  border-color: var(--c-active) !important;
+  box-shadow: 0 0 0 2px rgba(212, 0, 0, 0.2) !important;
+}
+
+#catalyst-login-iframe button {
+  background-color: var(--c-active) !important;
+  border: none !important;
+  border-radius: var(--radius-xs) !important;
+  color: white !important;
+  padding: 10px 20px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: background-color 0.2s ease !important;
+}
+
+#catalyst-login-iframe button:hover {
+  background-color: #b30000 !important;
+}
+
+#catalyst-login-iframe button:disabled {
+  background-color: var(--c-hover) !important;
+  cursor: not-allowed !important;
+}
+
+#catalyst-login-iframe label {
+  color: var(--c-text) !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+
+#catalyst-login-iframe a {
+  color: var(--c-active) !important;
+  text-decoration: none !important;
+}
+
+#catalyst-login-iframe a:hover {
+  text-decoration: underline !important;
+}
+
+#catalyst-login-iframe .error-message,
+#catalyst-login-iframe .catalyst-error {
+  color: var(--c-active) !important;
+  font-size: 12px !important;
+  margin-top: 4px !important;
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .loginContainer {
+    padding: 15px;
+    min-height: 350px;
+  }
+
+  .loginContent {
+    min-height: 300px;
+  }
+
+  .loginTitle {
+    font-size: 16px;
+  }
+}
