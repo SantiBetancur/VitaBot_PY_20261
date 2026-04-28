@@ -63,6 +63,22 @@
   align-items: center;
 }
 
+.registerButton {
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  background-color: #2563eb;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.registerButton:hover {
+  background-color: #1d4ed8;
+}
+
 .modelInfo {
   font-size: 11px;
   font-family: var(--font-mono);

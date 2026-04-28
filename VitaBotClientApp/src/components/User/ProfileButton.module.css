@@ -1,20 +1,42 @@
+.profileWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* ── Profile button ── */
 .profileButton {
   width: 40px;
   height: 40px;
   border-radius: 50%;
   border: none;
-  background-color: var(--c-accent);
+  background-color: #ffffff2c;
+  border: 1px solid var(--c-border);
   color: var(--c-text);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.2s ease;
-  font-size: 18px;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  font-size: 20px;
 }
 
 .profileButton:hover {
   background-color: var(--c-active);
+  color: var(--c-accent);
+}
+
+/* When logged in: show avatar initials style */
+.profileButton.loggedIn {
+  background-color: var(--c-active);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  box-shadow: 0 0 0 2px var(--c-accent, #bfdbfe);
+}
+
+.profileButton.loggedIn:hover {
+  box-shadow: 0 0 0 3px var(--c-active, #2563eb);
 }
 
 .icon {
@@ -23,6 +45,36 @@
   justify-content: center;
 }
 
+/* ── Dropdown profile panel ── */
+.profilePanel {
+  width: 350px;
+  margin-left: 20%;
+  background-color: var(--c-bg, #ffffff);
+  border: 1px solid var(--c-border, #e5e7eb);
+  border-radius: var(--radius);
+  box-shadow: 1px 8px 32px 15px rgba(19, 19, 19, 0.719);
+  z-index: 200;
+  animation: fadeInDown 0.15s ease;
+  overflow: hidden;
+  transition: ease-in 0.2s;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-10px);
+  }
+}
+
+.profilePanel:hover {
+  box-shadow: 1px 2px 10px 5px rgba(22, 22, 22, 0.918);
+  transition: ease-in-out 0.2s;
+}
+/* ── Login/Register modal ── */
 .loginModal {
   position: fixed;
   top: 0;
@@ -41,31 +93,31 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(19, 19, 19, 0.781);
   cursor: pointer;
 }
 
 .loginContent {
   position: relative;
-  background-color: white;
-  padding: 30px;
-  border-radius: 8px;
+  background-color: var(--c-bg);
+  padding: 45px 10px;
+  border-radius: 10px;
   max-width: 450px;
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 2px solid var(--c-border);
 }
 
 .closeButton {
   position: absolute;
-  top: 15px;
+  top: 7px;
   right: 15px;
   background: none;
   border: none;
   font-size: 24px;
   cursor: pointer;
-  color: #666;
+  color: #838383;
   width: 30px;
   height: 30px;
   display: flex;
@@ -78,4 +130,31 @@
 .closeButton:hover {
   background-color: #f0f0f0;
   color: #333;
+}
+
+.modalTabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.tabButton {
+  flex: 1;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  background-color: #f9fafb;
+  color: #111827;
+  cursor: pointer;
+  font-weight: 600;
+  transition: ease-in-out 0.1s;
+}
+.tabButton:hover {
+ box-shadow: 1px 1px 10px 1px var(--c-border);
+ transition: ease-in-out 0.1s;
+}
+
+.activeTab {
+  background-color: var(--c-active);
+  color: #ffffff;
 }

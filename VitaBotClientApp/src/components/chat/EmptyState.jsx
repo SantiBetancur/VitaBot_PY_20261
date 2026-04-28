@@ -1,12 +1,13 @@
 import styles from './EmptyState.module.css'
 
 const SUGGESTIONS = [
-  '¿Cómo funciona la IA?',
-  'Escríbeme un poema breve',
-  'Explica qué es React',
-  'Dame ideas para un proyecto',
-  'Resúmeme un concepto complejo',
-  'Ayúdame a escribir un correo',
+  '¿Cómo convertir un string a date-time en Deluge?',
+  'Ejemplo de función para calcular días entre dos fechas en Deluge',
+  '¿Cómo consumir una API externa usando invokeUrl en Deluge?',
+  '¿Cómo manejar errores en funciones de Deluge?',
+  'Script para crear o actualizar registros en Zoho CRM con Deluge',
+  '¿Cómo autenticar requests con OAuth en Deluge?',
+  '¿Cómo manejar respuestas JSON anidadas y extraer valores específicos en Deluge?',
 ]
 
 export default function EmptyState({ onSuggestion }) {
@@ -19,6 +20,7 @@ export default function EmptyState({ onSuggestion }) {
       <p className={styles.subtitle}>
         Escribe un mensaje o elige una sugerencia para comenzar.
       </p>
+      <hr />
       <div className={styles.chips} role="list" aria-label="Sugerencias">
         {SUGGESTIONS.map(s => (
           <button

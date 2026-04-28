@@ -41,12 +41,12 @@
   gap: 8px;
   justify-content: center;
   margin-top: 20px;
-  max-width: 480px;
+  max-width: 780px;
 }
 
 .chip {
   padding: 7px 14px;
-  border: 0.5px solid var(--c-border-md);
+  border: 1px solid var(--c-border);
   border-radius: 20px;
   font-size: 12px;
   font-weight: 400;
@@ -58,4 +58,5 @@
 
 .chip:hover {
   background: var(--c-active);
+  box-shadow: 0.5px 0.5px 3px 0.5px var(--c-border);
 }

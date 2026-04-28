@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import NewChatButton from '../Chat/NewchatButton'
 import HistoryList from '../Chat/HistoryList'
 import ProfileButton from '../User/ProfileButton'
@@ -7,6 +8,7 @@ import logo from '../../assets/images/logo2.png'
 
 export default function Sidebar() {
   const { chats, activeChatId, createChat, deleteChat, selectChat } = useChatHistory()
+  const [registerSignal, setRegisterSignal] = useState(0)
 
   return (
     <aside className={styles.sidebar} aria-label="Panel lateral">
@@ -27,7 +29,8 @@ export default function Sidebar() {
       />
 
       <div className={styles.footer}>
-        <ProfileButton />
+        <ProfileButton openRegisterSignal={registerSignal} />
+      
         <hr />
         <div className={styles.modelInfo}>
           modelo · Haiku-4.5
