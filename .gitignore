@@ -1,3 +1,4 @@
 /.build
 .env
 /catalyst.json
+__pycache__/

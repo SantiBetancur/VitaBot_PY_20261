@@ -1,4 +1,7 @@
 zcatalyst-sdk==1.2.0
 python-dotenv
 requests
+openai
+supabase
+numpy
 anthropic
