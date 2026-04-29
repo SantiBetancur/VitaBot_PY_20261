@@ -93,7 +93,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(19, 19, 19, 0.781);
+  background-color: rgba(34, 34, 34, 0.781);
   cursor: pointer;
 }
 
@@ -143,18 +143,19 @@
   padding: 10px 12px;
   border: none;
   border-radius: 8px;
-  background-color: #f9fafb;
-  color: #111827;
+  background-color: var(--c-surface);
+  color: #ffff;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 500;
   transition: ease-in-out 0.1s;
 }
 .tabButton:hover {
- box-shadow: 1px 1px 10px 1px var(--c-border);
+ box-shadow: 0.5px 0.5px 10px 1px var(--c-border);
  transition: ease-in-out 0.1s;
 }
 
 .activeTab {
-  background-color: var(--c-active);
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-border);
   color: #ffffff;
 }
