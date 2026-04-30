@@ -37,12 +37,14 @@ const CatalystRegistration = ({ onRegistered, onCancel }) => {
       return
     }
 
+    const APP_DOMAIN = import.meta.env.VITE_APP_DOMAIN || 'http://localhost:3001'
+
     const signupData = {
       first_name: firstName,
       last_name: lastName,
       email_id: email,
       platform_type: 'web',
-      redirect_url: 'http://localhost:3001/'
+      redirect_url: `${APP_DOMAIN}/`
     }
 
     try {

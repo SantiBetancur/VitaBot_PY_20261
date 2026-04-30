@@ -22,7 +22,6 @@ from sessions import create_session, get_session_by_id, update_session_activity
 from messages import get_messages, save_messages
 
 load_dotenv()
-
 logger = logging.getLogger(__name__)
 
 CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
@@ -65,7 +64,7 @@ def add_cors_headers(response, request_origin=None):
     allowed_origin = request_origin or "http://localhost:3001"
     response.headers["Access-Control-Allow-Origin"] = allowed_origin
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Origin"
     response.headers["Access-Control-Allow-Credentials"] = "true"
     response.headers["Access-Control-Max-Age"] = "3600"
     response.headers["Vary"] = "Origin"
@@ -202,26 +201,46 @@ def call_claude_api(conversation_messages, context=None, sources=None, memory_on
             "anthropic-version": "2023-06-01"
         }
 
-        system_message = "Eres un asistente amable, conciso y util. Responde siempre en el idioma del usuario."
+        BASE_ROLE = """Eres un experto en el lenguaje de scripting Deluge y el ecosistema Zoho (CRM, Desk, Creator, Cliq, Flow, etc.).
+Tu misión principal es ayudar a los desarrolladores a escribir, corregir y entender código Deluge de forma precisa y completa.
+
+Reglas generales:
+- Responde siempre en el idioma del usuario.
+- Cuando generes código: hazlo completo (nunca fragmentos sin contexto), con comentarios explicativos en línea, y usando nombres de variables/módulos realistas según la información provista (Para variables y estructura general del código puedes ser creativo siempre que NO INVENTES LA SINTAXIS DE DELUGE).
+- Si el usuario da detalles de su entorno (nombre de módulos, campos, conexiones), úsalos directamente en el código; no uses placeholders genéricos como "YOUR_MODULE".
+- Indica siempre si una función, método o comportamiento depende de una versión específica de Zoho o Deluge, o si puede variar entre productos Zoho (CRM vs Creator, por ejemplo).
+- Ante ambigüedad técnica, pregunta lo mínimo necesario antes de generar código.
+- Sé conciso en las explicaciones; prioriza el código funcional sobre la prosa."""
+
+
+        system_message = BASE_ROLE
         if memory_only:
-            system_message += (
-                "\n\nSolo puedes responder usando el historial de esta conversacion."
-                "\nSi la respuesta no aparece en el historial, di que no la sabes."
-                "\nNo uses conocimiento general ni inventes informacion."
-            )
+            system_message += """--- MODO: SOLO HISTORIAL ---
+                    En este momento solo puedes responder usando el historial de esta conversación.
+                    - Si hay fragmentos de código previos en el historial, mantenlos consistentes: no cambies nombres de variables, módulos ni estructuras ya definidas.
+                    - Si la respuesta no aparece en el historial, indícalo claramente: "No tengo esa información en nuestra conversación."
+                    - No uses conocimiento general, no extrapoles ni inventes funciones o parámetros."""
         elif context:
-            system_message += f"\n\n{context}"
-            system_message += "\n\nResponde basandote en la informacion del contexto proporcionado."
-            system_message += (
-                "\nUsa tambien el historial de la conversacion si ayuda."
-                "\nSi la pregunta no se puede responder con el historial o con el contexto proporcionado,"
-                " di claramente que no tienes informacion suficiente."
-                "\nNo respondas con conocimiento general fuera de esas fuentes."
-            )
+            system_message += """--- CONTEXTO DE DOCUMENTACIÓN OFICIAL ---
+                        {context}
+                        --- FIN DEL CONTEXTO ---
+
+                        Instrucciones para usar el contexto:
+                        1. El contexto anterior proviene de la documentación oficial de Zoho. Es tu fuente primaria y más confiable.
+                        2. Usa también el historial de la conversación para mantener consistencia con lo ya desarrollado.
+                        3. Jerarquía de fuentes: documentación oficial > historial de conversación > tu conocimiento interno.
+                        4. Cuando generes código basado en el contexto:
+                        - Usa exactamente los nombres de funciones, parámetros y sintaxis que aparecen en la documentación.
+                        - Incorpora los datos reales que el usuario haya proporcionado (campos, módulos, conexiones).
+                        - Genera el código completo, no solo el fragmento relevante.
+                        5. Si el contexto menciona limitaciones, deprecaciones o diferencias por producto Zoho, adviértelo explícitamente al usuario.
+                        6. Si la pregunta no puede responderse con el contexto ni con el historial, dilo claramente:
+                        "No encontré información suficiente en la documentación disponible para responder esto con certeza."
+                        No respondas con conocimiento general como sustituto de la documentación oficial."""
 
         payload = {
             "model": CLAUDE_MODEL,
-            "max_tokens": 1024,
+            "max_tokens": 4096,
             "system": system_message,
             "messages": conversation_messages
         }
@@ -233,7 +252,13 @@ def call_claude_api(conversation_messages, context=None, sources=None, memory_on
         bot_response = data["content"][0]["text"]
 
         if sources:
-            bot_response += f"\n\nFuentes utilizadas: {', '.join(sources)}"
+            formatted_sources = "\n".join(f"| `{source}` |" for source in sources)
+            bot_response += (
+                "\n\n## Fuentes utilizadas\n\n"
+                "| Fuente |\n"
+                "| --- |\n"
+                f"{formatted_sources}"
+            )
 
         return bot_response
 
@@ -255,6 +280,28 @@ def resolve_authenticated_user(app):
     user_response = get_or_create_user({"external_id": external_id})
     if not user_response["success"]:
         raise Exception(user_response["error"])
+
+    return {
+        "external_id": external_id,
+        "user_id": user_response["data"]["user_id"]
+    }
+
+
+def resolve_optional_authenticated_user(app):
+    try:
+        auth_user = app.authentication().get_current_user()
+    except Exception as exc:
+        logger.warning("Error checking authentication: %s", str(exc))
+        return None
+
+    if not auth_user or not isinstance(auth_user, dict) or not auth_user.get("user_id"):
+        return None
+
+    external_id = auth_user["user_id"]
+    user_response = get_or_create_user({"external_id": external_id})
+    if not user_response["success"]:
+        logger.warning("Unable to resolve authenticated user: %s", user_response.get("error"))
+        return None
 
     return {
         "external_id": external_id,
@@ -329,20 +376,22 @@ def handler(request: Request):
                 "message": "Message cannot be empty"
             }, 400, request_origin=request_origin)
 
-        try:
-            user_info = resolve_authenticated_user(app)
-        except Exception as auth_error:
-            logger.error("Authentication error: %s", str(auth_error))
-            return build_json_response({
-                "status": "error",
-                "message": "Usuario no autenticado en Catalyst"
-            }, 401, request_origin=request_origin)
+        user_info = resolve_optional_authenticated_user(app)
+        if user_info:
+            session_id = resolve_session(user_info["user_id"], requested_session_id)
+            conversation_messages = build_conversation_messages(session_id, user_message)
+        else:
+            logger.info("Guest request received: no authenticated Catalyst user")
+            session_id = None
+            conversation_messages = build_conversation_messages(None, user_message)
 
-        session_id = resolve_session(user_info["user_id"], requested_session_id)
-        conversation_messages = build_conversation_messages(session_id, user_message)
         memory_question = is_memory_question(user_message)
 
-        logger.info("Received message from user %s", user_info["external_id"])
+        if user_info:
+            logger.info("Received message from user %s", user_info["external_id"])
+        else:
+            logger.info("Received guest request without authenticated Catalyst user")
+
         logger.info("Generating embedding for user message")
         embedding = get_embedding(user_message)
 
@@ -379,13 +428,17 @@ def handler(request: Request):
             "has_context": bool(similar_docs)
         }
 
-        persist_conversation(session_id, user_message, bot_response, sources)
-
-        response_data.update({
-            "session_id": session_id,
-            "user_id": user_info["user_id"],
-            "external_id": user_info["external_id"]
-        })
+        if user_info:
+            persist_conversation(session_id, user_message, bot_response, sources)
+            response_data.update({
+                "session_id": session_id,
+                "user_id": user_info["user_id"],
+                "external_id": user_info["external_id"]
+            })
+        else:
+            response_data.update({
+                "session_id": None
+            })
 
         return build_json_response(response_data, 200, request_origin=request_origin)
 

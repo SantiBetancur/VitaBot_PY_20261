@@ -1,4 +1,5 @@
 import styles from './EmptyState.module.css'
+import logo from '../../assets/images/logo2.png'
 
 const SUGGESTIONS = [
   '¿Cómo convertir un string a date-time en Deluge?',
@@ -13,8 +14,8 @@ const SUGGESTIONS = [
 export default function EmptyState({ onSuggestion }) {
   return (
     <div className={styles.container} role="main">
-      <div className={styles.icon} aria-hidden>
-        <SparkIcon />
+      <div>
+        <img className={styles.logo} src={logo} alt="LogoVT" />
       </div>
       <h2 className={styles.title}>¿En qué puedo ayudarte?</h2>
       <p className={styles.subtitle}>

@@ -11,7 +11,7 @@ def add_cors_headers(response, request_origin=None):
     allowed_origin = request_origin or "http://localhost:3001"
     response.headers["Access-Control-Allow-Origin"] = allowed_origin
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Origin"
     response.headers["Access-Control-Allow-Credentials"] = "true"
     response.headers["Access-Control-Max-Age"] = "3600"
     response.headers["Vary"] = "Origin"
@@ -32,13 +32,16 @@ def respond(payload, request_origin=None):
 
 
 def handler(request: Request):
-    app = zcatalyst_sdk.initialize()
-    logger = logging.getLogger()
-    request_origin = request.headers.get("Origin")
 
+    request_origin = request.headers.get("Origin")
     if request.method == "OPTIONS":
         return add_cors_headers(make_response("", 200), request_origin=request_origin)
 
+    app = zcatalyst_sdk.initialize()
+    logger = logging.getLogger()
+    
+
+    
     try:
         data = parse_request_data(request)
         method = request.method

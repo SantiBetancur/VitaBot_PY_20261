@@ -4,7 +4,7 @@ import HistoryList from '../Chat/HistoryList'
 import ProfileButton from '../User/ProfileButton'
 import { useChatHistory } from '../../hooks/useChatHistory'
 import styles from './Sidebar.module.css'
-import logo from '../../assets/images/logo2.png'
+import logo from '../../assets/images/logoVT2.png'
 
 export default function Sidebar() {
   const { chats, activeChatId, createChat, deleteChat, selectChat } = useChatHistory()

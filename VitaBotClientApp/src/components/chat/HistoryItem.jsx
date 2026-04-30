@@ -1,10 +1,16 @@
 import styles from './HistoryItem.module.css'
 
 function formatDate(ts) {
-  const diff = Math.floor((Date.now() - ts) / 86_400_000)
-  if (diff === 0) return 'Hoy'
-  if (diff === 1) return 'Ayer'
-  if (diff < 7) return `Hace ${diff} días`
+  const now = Date.now()
+  const diffMs = now - ts
+  const diffHours = Math.floor(diffMs / 3_600_000)
+  const diffDays = Math.floor(diffMs / 86_400_000)
+
+  if (diffHours < 1) return 'Hace poco'
+  if (diffHours < 24) return `Hace ${diffHours}h`
+  if (diffDays === 0) return 'Hoy'
+  if (diffDays === 1) return 'Ayer'
+  if (diffDays < 7) return `Hace ${diffDays} días`
   return new Date(ts).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })
 }
 

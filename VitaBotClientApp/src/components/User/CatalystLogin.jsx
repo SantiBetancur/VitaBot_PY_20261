@@ -6,7 +6,7 @@ const CatalystLogin = ({ onSuccess, onError }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { isReady, error: sdkError } = useCatalystSDK();
-
+  
   useEffect(() => {
     if (sdkError) {
       setError(sdkError);
@@ -22,6 +22,7 @@ const CatalystLogin = ({ onSuccess, onError }) => {
       try {
         let auth = window.catalyst.auth;
         auth.signIn('loginDivElementId', config);
+
         console.log('✓ Catalyst signIn initialized', auth );
         setIsLoading(false);
       } catch (initError) {

@@ -1,11 +1,14 @@
 import { createContext, useContext, useReducer, useCallback, useEffect, useRef } from 'react'
 
-const SESSIONS_API_URL = 'http://localhost:3000/server/fn_sessions_management'
+const BACKEND_URL = import.meta.env.VITE_BACKEND_DOMAIN || 'http://localhost:3000'
+const SESSIONS_API_URL = `${BACKEND_URL}/server/fn_sessions_management`
 
 const initialState = {
   chats: [],
   activeChatId: null,
   isTyping: false,
+  isLoadingHistory: true,
+  isAuthenticated: null,
 }
 
 export const ACTIONS = {
@@ -17,6 +20,8 @@ export const ACTIONS = {
   UPDATE_TITLE: 'UPDATE_TITLE',
   SET_SESSION_ID: 'SET_SESSION_ID',
   HYDRATE_CHATS: 'HYDRATE_CHATS',
+  SET_LOADING_HISTORY: 'SET_LOADING_HISTORY',
+  SET_AUTHENTICATION: 'SET_AUTHENTICATION',
 }
 
 function chatReducer(state, action) {
@@ -91,6 +96,12 @@ function chatReducer(state, action) {
     case ACTIONS.SET_TYPING:
       return { ...state, isTyping: action.payload }
 
+    case ACTIONS.SET_LOADING_HISTORY:
+      return { ...state, isLoadingHistory: action.payload }
+
+    case ACTIONS.SET_AUTHENTICATION:
+      return { ...state, isAuthenticated: action.payload }
+
     default:
       return state
   }
@@ -126,6 +137,7 @@ export function ChatProvider({ children }) {
     hasHydratedRef.current = true
 
     const hydrateChats = async () => {
+      dispatch({ type: ACTIONS.SET_LOADING_HISTORY, payload: true })
       try {
         const sessionsResponse = await fetch(`${SESSIONS_API_URL}/sessions`, {
           method: 'GET',
@@ -134,6 +146,8 @@ export function ChatProvider({ children }) {
 
         if (sessionsResponse.status === 401) {
           dispatch({ type: ACTIONS.HYDRATE_CHATS, payload: [] })
+          dispatch({ type: ACTIONS.SET_AUTHENTICATION, payload: false })
+          dispatch({ type: ACTIONS.SET_LOADING_HISTORY, payload: false })
           return
         }
 
@@ -173,8 +187,11 @@ export function ChatProvider({ children }) {
 
         hydratedChats.sort((a, b) => b.createdAt - a.createdAt)
         dispatch({ type: ACTIONS.HYDRATE_CHATS, payload: hydratedChats })
+        dispatch({ type: ACTIONS.SET_AUTHENTICATION, payload: true })
+        dispatch({ type: ACTIONS.SET_LOADING_HISTORY, payload: false })
       } catch (error) {
         console.error('Error loading chat history:', error)
+        dispatch({ type: ACTIONS.SET_LOADING_HISTORY, payload: false })
       }
     }
 
@@ -186,9 +203,35 @@ export function ChatProvider({ children }) {
     return id
   }, [])
 
-  const deleteChat = useCallback((id) => {
+  const deleteChat = useCallback(async (id) => {
+    const chat = state.chats.find(c => c.id === id)
+
+    if (chat?.sessionId && state.isAuthenticated !== false) {
+      try {
+        const response = await fetch(
+          `${SESSIONS_API_URL}/session?session_id=${encodeURIComponent(chat.sessionId)}`,
+          {
+            method: 'DELETE',
+            credentials: 'include',
+          }
+        )
+
+        if (!response.ok) {
+          throw new Error(`Error eliminando sesión: HTTP ${response.status}`)
+        }
+
+        const payload = await response.json()
+        if (!payload?.success) {
+          throw new Error(payload?.error || 'No se pudo eliminar la sesión')
+        }
+      } catch (error) {
+        console.error('Error al eliminar historial en servidor:', error)
+        return
+      }
+    }
+
     dispatch({ type: ACTIONS.DELETE_CHAT, payload: id })
-  }, [])
+  }, [state.chats])
 
   const selectChat = useCallback((id) => {
     dispatch({ type: ACTIONS.SELECT_CHAT, payload: id })
@@ -203,7 +246,7 @@ export function ChatProvider({ children }) {
   }, [state.chats])
 
   return (
-    <ChatContext.Provider value={{ state, dispatch, createChat, deleteChat, selectChat, getActiveChat, getChatById }}>
+    <ChatContext.Provider value={{ state, dispatch, createChat, deleteChat, selectChat, getActiveChat, getChatById, isLoadingHistory: state.isLoadingHistory, isAuthenticated: state.isAuthenticated }}>
       {children}
     </ChatContext.Provider>
   )

@@ -1,0 +1,35 @@
+.skeletonItem {
+  position: relative;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+}
+
+.skeletonTitle {
+  height: 14px;
+  background: var(--c-hover);
+  border-radius: var(--radius-xs);
+  margin-bottom: 6px;
+  animation: shimmer 2s infinite;
+  width: 85%;
+}
+
+.skeletonMeta {
+  height: 11px;
+  background: var(--c-hover);
+  border-radius: var(--radius-xs);
+  animation: shimmer 2s infinite;
+  width: 45%;
+}
+
+@keyframes shimmer {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}

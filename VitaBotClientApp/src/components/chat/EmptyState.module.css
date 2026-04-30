@@ -60,3 +60,9 @@
   background: var(--c-active);
   box-shadow: 0.5px 0.5px 3px 0.5px var(--c-border);
 }
+
+.logo {
+  width: 250px;
+  height: auto;
+  margin-bottom: 16px;
+}
