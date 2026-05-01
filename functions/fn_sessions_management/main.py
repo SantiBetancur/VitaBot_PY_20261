@@ -8,7 +8,7 @@ from messages import get_messages, save_messages, get_user_messages
 
 
 def add_cors_headers(response, request_origin=None):
-    allowed_origin = request_origin or "http://localhost:3001"
+    allowed_origin = request_origin or "http://localhost:4800"
     response.headers["Access-Control-Allow-Origin"] = allowed_origin
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Origin"
@@ -32,16 +32,14 @@ def respond(payload, request_origin=None):
 
 
 def handler(request: Request):
-
     request_origin = request.headers.get("Origin")
+
     if request.method == "OPTIONS":
         return add_cors_headers(make_response("", 200), request_origin=request_origin)
 
     app = zcatalyst_sdk.initialize()
     logger = logging.getLogger()
-    
 
-    
     try:
         data = parse_request_data(request)
         method = request.method
@@ -55,7 +53,6 @@ def handler(request: Request):
                 auth_user = app.authentication().get_current_user()
                 if not auth_user or not auth_user.get("user_id"):
                     raise Exception("Catalyst no devolvio un usuario autenticado")
-
                 external_id = auth_user["user_id"]
 
                 user_response = get_user_by_external_id(external_id)
