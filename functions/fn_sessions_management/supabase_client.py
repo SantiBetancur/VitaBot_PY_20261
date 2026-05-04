@@ -2,16 +2,14 @@ import os
 import logging
 import requests
 
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ImportError:
-    pass
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-SUPABASE_URL = os.environ.get("PROJECT_DB_URL")
-SUPABASE_KEY = os.environ.get("SECRET_DB_API_KEY")
+SUPABASE_URL = os.getenv("PROJECT_DB_URL")
+SUPABASE_KEY = os.getenv("SECRET_DB_API_KEY")
 
 if not SUPABASE_URL or not SUPABASE_KEY:
     raise Exception("Faltan variables de entorno: PROJECT_DB_URL o SECRET_DB_API_KEY")
