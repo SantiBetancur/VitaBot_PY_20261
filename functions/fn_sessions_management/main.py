@@ -5,10 +5,10 @@ import zcatalyst_sdk
 from users import get_or_create_user, get_user_by_external_id
 from sessions import create_session, update_session_activity, delete_session, get_user_sessions
 from messages import get_messages, save_messages, get_user_messages
-
+APP_DOMAIN = "https://vitabot-py-20261-kzkxzltd.onslate.com"
 
 def add_cors_headers(response, request_origin=None):
-    allowed_origin = request_origin or "http://localhost:4800"
+    allowed_origin = request_origin or APP_DOMAIN
     response.headers["Access-Control-Allow-Origin"] = allowed_origin
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Origin"
