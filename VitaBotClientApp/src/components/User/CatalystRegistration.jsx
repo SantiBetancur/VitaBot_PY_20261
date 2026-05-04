@@ -10,7 +10,7 @@ const CatalystRegistration = ({ onRegistered, onCancel }) => {
   const [status, setStatus] = useState(null)
   const [error, setError] = useState(null)
   const { isReady, error: sdkError } = useCatalystSDK()
-  const APP_DOMAIN = "https://vitabot-py-20261-kzkxzltd.onslate.com"
+  const APP_DOMAIN = "https://vitabotclientapp-ycwjmrpr.onslate.com"
 
   useEffect(() => {
     if (sdkError) {
