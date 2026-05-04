@@ -5,10 +5,15 @@ import zcatalyst_sdk
 from users import get_or_create_user, get_user_by_external_id
 from sessions import create_session, update_session_activity, delete_session, get_user_sessions
 from messages import get_messages, save_messages, get_user_messages
-
+APP_DOMAIN = "https://vitabotclientapp-ycwjmrpr.onslate.com"
 
 def add_cors_headers(response, request_origin=None):
-    allowed_origin = request_origin or "http://localhost:3001"
+    allowed_origins = {
+        "http://localhost:3001",
+        "https://vitabotclientapp-ycwjmrpr.onslate.com",
+    }
+    allowed_origin = request_origin if request_origin in allowed_origins else "http://localhost:3001"
+
     response.headers["Access-Control-Allow-Origin"] = allowed_origin
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Origin"
@@ -91,8 +96,29 @@ def handler(request: Request):
             }), 200)
             return add_cors_headers(response, request_origin=request_origin)
 
+        if path == "/user" and method == "GET":
+            external_id_param = data.get("external_id")
+            if not external_id_param:
+                return respond({"success": False, "code": 400, "error": "external_id required"}, request_origin=request_origin)
+            return respond(get_user_by_external_id(external_id_param), request_origin=request_origin)
+
+        if path == "/user" and method == "POST":
+            return respond(get_or_create_user(data), request_origin=request_origin)
+
         if path == "/session" and method == "POST":
             return respond(create_session({"user_id": db_user_id}), request_origin=request_origin)
+
+        if path == "/session" and method == "GET":
+            session_id = data.get("session_id")
+            user_id_param = data.get("user_id")
+            if not session_id or not user_id_param:
+                return respond({"success": False, "code": 400, "error": "session_id and user_id required"}, request_origin=request_origin)
+            # Verificar que el user_id_param coincida con el autenticado
+            if str(user_id_param) != str(db_user_id):
+                return respond({"success": False, "code": 403, "error": "Unauthorized to access this session"}, request_origin=request_origin)
+            # Necesito implementar get_session_by_id en sessions.py
+            from sessions import get_session_by_id
+            return respond(get_session_by_id(session_id, user_id_param), request_origin=request_origin)
 
         if path == "/session" and method == "PUT":
             return respond(update_session_activity(data), request_origin=request_origin)
