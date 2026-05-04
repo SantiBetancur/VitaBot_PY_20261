@@ -1,0 +1,83 @@
+[debug] [2026-05-04T16:30:53.554Z] : 
+[debug] [2026-05-04T16:30:53.555Z] : ----------------------------------------------------------------------
+[debug] [2026-05-04T16:30:53.555Z] : Command:      C:\Program Files\nodejs\node.exe C:\Users\santi\AppData\Roaming\npm\node_modules\zcatalyst-cli\lib\bin\catalyst.js serve --only slate
+[debug] [2026-05-04T16:30:53.555Z] : CLI Version:  1.25.2
+[debug] [2026-05-04T16:30:53.555Z] : Platform:     win32
+[debug] [2026-05-04T16:30:53.555Z] : Node Version: v24.12.0
+[debug] [2026-05-04T16:30:53.556Z] : Time:         Mon May 04 2026 11:30:53 GMT-0500 (hora estándar de Colombia)
+[debug] [2026-05-04T16:30:53.556Z] : ----------------------------------------------------------------------
+[debug] [2026-05-04T16:30:53.556Z] : 
+[debug] [2026-05-04T16:30:54.040Z] : > authorizing via signed-in user option
+[debug] [2026-05-04T16:30:54.041Z] : > command requires scopes: ["ZohoCatalyst.projects.ALL","ZohoCatalyst.apigateway.apis.READ","ZohoCatalyst.apigateway.READ","ZohoCatalyst.segments.ALL","ZohoCatalyst.cache.READ","ZohoCatalyst.cache.CREATE","ZohoCatalyst.cache.DELETE","ZohoCatalyst.projects.ALL","ZohoCatalyst.cron.ALL","ZohoCatalyst.zcql.CREATE","ZohoCatalyst.projects.users.READ","ZohoCatalyst.projects.users.CREATE","ZohoCatalyst.projects.users.DELETE","ZohoCatalyst.projects.users.UPDATE","ZohoCatalyst.authentication.CREATE","ZohoCatalyst.email.CREATE","ZohoCatalyst.tables.ALL","ZohoCatalyst.tables.rows.ALL","ZohoCatalyst.tables.columns.ALL","ZohoCatalyst.tables.bulk.CREATE","ZohoCatalyst.tables.bulk.READ","ZohoCatalyst.folders.ALL","ZohoCatalyst.files.CREATE","ZohoCatalyst.files.READ","ZohoCatalyst.files.DELETE","ZohoCatalyst.functions.ALL","ZohoCatalyst.functions.EXECUTE","ZohoCatalyst.eventlistners.ALL","ZohoCatalyst.eventlisteners.produce","ZohoCatalyst.security.rules.Read","ZohoCatalyst.security.rules.Update","ZohoCatalyst.notifications.mobile","ZohoCatalyst.notifications.web","ZohoCatalyst.search.READ","ZohoCatalyst.mlkit.READ","QuickML.deployment.READ","ZohoCatalyst.pdfshot.execute","ZohoCatalyst.dataverse.execute","ZohoCatalyst.grid.READ","ZohoCatalyst.grid.terminate","ZohoCatalyst.circuits.execution.DELETE","ZohoCatalyst.circuits.execution.READ","ZohoCatalyst.circuits.execute","ZohoCatalyst.appsail.Read","ZohoCatalyst.jobpool.READ","ZohoCatalyst.job.ALL","ZohoCatalyst.nosql.READ","ZohoCatalyst.nosql.rows.ALL"]
+[debug] [2026-05-04T16:30:54.050Z] : >>>> HTTP REQUEST : GET https://api.catalyst.zoho.com/baas/v1/project/43287000000035021 
+
+[debug] [2026-05-04T16:30:55.673Z] : <<<< HTTP RESPONSE : 200
+Response Headers: {"server":"ZGS","date":"Mon, 04 May 2026 16:30:57 GMT","content-type":"application/vnd.catalyst.v2+json","transfer-encoding":"chunked","connection":"keep-alive","x-content-type-options":"nosniff","cache-control":"private,no-cache,no-store,max-age=0,must-revalidate","pragma":"no-cache","expires":"Thu, 01 Jan 1970 00:00:00 GMT","x-frame-options":"DENY","strict-transport-security":"max-age=64072000; includeSubDomains; preload"}
+
+[debug] [2026-05-04T16:30:55.675Z] : >>>> HTTP REQUEST : GET https://api.catalyst.zoho.com/baas/v1/project/43287000000035021/environment 
+
+[debug] [2026-05-04T16:30:55.877Z] : <<<< HTTP RESPONSE : 200
+Response Headers: {"server":"ZGS","date":"Mon, 04 May 2026 16:30:57 GMT","content-type":"application/vnd.catalyst.v2+json","transfer-encoding":"chunked","connection":"keep-alive","x-content-type-options":"nosniff","cache-control":"private,no-cache,no-store,max-age=0,must-revalidate","pragma":"no-cache","expires":"Thu, 01 Jan 1970 00:00:00 GMT","x-frame-options":"DENY","strict-transport-security":"max-age=64072000; includeSubDomains; preload"}
+
+[debug] [2026-05-04T16:30:56.096Z] : http port : '3000' is not available. Hence port '3001' will be used instead.
+[debug] [2026-05-04T16:30:56.101Z] : No basic functions to add
+[info] [2026-05-04T16:31:00.545Z] : Skipping API Gateway rules
+[info] [2026-05-04T16:31:00.695Z] : 
+[info] [2026-05-04T16:31:00.695Z] :  >>>>>>>>>>>>>> Slate <<<<<<<<<<<<<< 
+[info] [2026-05-04T16:31:00.696Z] : i VitaBotClientApp: http://localhost:3001
+[info] [2026-05-04T16:31:00.696Z] : 
+[info] [2026-05-04T16:31:08.506Z] : [1777912268500]  "GET"  "/"
+[info] [2026-05-04T16:31:08.658Z] : [1777912268655]  "GET"  "/@vite/client"
+[info] [2026-05-04T16:31:08.727Z] : [1777912268722]  "GET"  "/src/main.jsx"
+[info] [2026-05-04T16:31:08.984Z] : [1777912268984]  "GET"  "/@react-refresh"
+[info] [2026-05-04T16:31:09.082Z] : [1777912269082]  "GET"  "/node_modules/vite/dist/client/env.mjs"
+[info] [2026-05-04T16:31:09.086Z] : [1777912269085]  "GET"  "/src/assets/css/global.css"
+[info] [2026-05-04T16:31:09.089Z] : [1777912269088]  "GET"  "/src/App.jsx"
+[info] [2026-05-04T16:31:09.473Z] : [1777912269472]  "GET"  "/src/context/Chatcontext.jsx"
+[info] [2026-05-04T16:31:09.476Z] : [1777912269475]  "GET"  "/src/components/Sidebar/Sidebar.jsx"
+[info] [2026-05-04T16:31:09.478Z] : [1777912269477]  "GET"  "/src/components/Chat/ChatArea.jsx"
+[info] [2026-05-04T16:31:09.479Z] : [1777912269479]  "GET"  "/src/App.module.css"
+[info] [2026-05-04T16:31:09.730Z] : [1777912269727]  "GET"  "/src/components/Chat/NewchatButton.jsx"
+[info] [2026-05-04T16:31:09.832Z] : [1777912269829]  "GET"  "/src/components/Chat/HistoryList.jsx"
+[info] [2026-05-04T16:31:09.836Z] : [1777912269835]  "GET"  "/src/components/User/ProfileButton.jsx"
+[info] [2026-05-04T16:31:09.861Z] : [1777912269860]  "GET"  "/src/hooks/useChatHistory.js"
+[info] [2026-05-04T16:31:09.873Z] : [1777912269865]  "GET"  "/src/components/Sidebar/Sidebar.module.css"
+[info] [2026-05-04T16:31:09.880Z] : [1777912269875]  "GET"  "/src/components/Chat/TopBar.jsx"
+[info] [2026-05-04T16:31:10.096Z] : [1777912270095]  "GET"  "/src/assets/images/logoVT2.png?import"
+[info] [2026-05-04T16:31:10.214Z] : [1777912270213]  "GET"  "/src/components/Chat/MessageList.jsx"
+[info] [2026-05-04T16:31:10.216Z] : [1777912270215]  "GET"  "/src/hooks/useChat.js"
+[info] [2026-05-04T16:31:10.217Z] : [1777912270217]  "GET"  "/src/components/Chat/ChatArea.module.css"
+[info] [2026-05-04T16:31:10.218Z] : [1777912270218]  "GET"  "/src/components/InputArea/InputArea.jsx"
+[info] [2026-05-04T16:31:10.220Z] : [1777912270219]  "GET"  "/src/components/Chat/NewChatButton.module.css"
+[info] [2026-05-04T16:31:10.421Z] : [1777912270415]  "GET"  "/src/components/User/ProfileButton.module.css"
+[info] [2026-05-04T16:31:10.533Z] : [1777912270533]  "GET"  "/src/components/User/CatalystLogin.jsx"
+[info] [2026-05-04T16:31:10.547Z] : [1777912270546]  "GET"  "/src/components/User/CatalystRegistration.jsx"
+[info] [2026-05-04T16:31:10.561Z] : [1777912270551]  "GET"  "/src/components/User/UserProfile.jsx"
+[info] [2026-05-04T16:31:10.563Z] : [1777912270563]  "GET"  "/src/hooks/useCatalystSDK.js"
+[info] [2026-05-04T16:31:10.565Z] : [1777912270565]  "GET"  "/src/components/Chat/TopBar.module.css"
+[info] [2026-05-04T16:31:10.744Z] : [1777912270743]  "GET"  "/src/components/Chat/HistoryItemSkeleton.jsx"
+[info] [2026-05-04T16:31:10.851Z] : [1777912270850]  "GET"  "/src/components/Chat/HistoryList.module.css"
+[info] [2026-05-04T16:31:10.884Z] : [1777912270884]  "GET"  "/src/components/Chat/HistoryItem.jsx"
+[info] [2026-05-04T16:31:10.886Z] : [1777912270886]  "GET"  "/src/components/Chat/Message.jsx"
+[info] [2026-05-04T16:31:10.888Z] : [1777912270888]  "GET"  "/src/components/Chat/TypingIndicator.jsx"
+[info] [2026-05-04T16:31:10.892Z] : [1777912270890]  "GET"  "/src/components/Chat/MessageList.module.css"
+[info] [2026-05-04T16:31:11.064Z] : [1777912271061]  "GET"  "/src/components/Chat/EmptyState.jsx"
+[info] [2026-05-04T16:31:11.182Z] : [1777912271181]  "GET"  "/src/components/Chat/SendButton.jsx"
+[info] [2026-05-04T16:31:11.289Z] : [1777912271238]  "GET"  "/src/hooks/useAutoResize.js"
+[info] [2026-05-04T16:31:11.305Z] : [1777912271301]  "GET"  "/src/components/InputArea/InputArea.module.css"
+[info] [2026-05-04T16:31:11.332Z] : [1777912271310]  "GET"  "/src/components/User/CatalystLogin.module.css"
+[info] [2026-05-04T16:31:11.337Z] : [1777912271336]  "GET"  "/src/components/User/CatalystRegistration.module.css"
+[info] [2026-05-04T16:31:11.383Z] : [1777912271381]  "GET"  "/src/components/User/UserProfile.module.css"
+[info] [2026-05-04T16:31:11.543Z] : [1777912271542]  "GET"  "/src/components/Chat/HistoryItemSkeleton.module.css"
+[info] [2026-05-04T16:31:11.693Z] : [1777912271691]  "GET"  "/src/components/Chat/TypingIndicator.module.css"
+[info] [2026-05-04T16:31:11.696Z] : [1777912271696]  "GET"  "/src/components/Chat/HistoryItem.module.css"
+[info] [2026-05-04T16:31:11.698Z] : [1777912271698]  "GET"  "/src/components/Chat/Message.module.css"
+[info] [2026-05-04T16:31:11.700Z] : [1777912271699]  "GET"  "/src/components/Chat/EmptyState.module.css"
+[info] [2026-05-04T16:31:11.782Z] : [1777912271780]  "GET"  "/src/assets/images/logo2.png?import"
+[info] [2026-05-04T16:31:11.862Z] : [1777912271860]  "GET"  "/src/components/Chat/SendButton.module.css"
+[info] [2026-05-04T16:31:12.243Z] : [1777912272243]  "GET"  "/src/assets/images/logoVT2.png"
+[info] [2026-05-04T16:31:12.245Z] : [1777912272245]  "GET"  "/src/assets/images/logo2.png"
+[info] [2026-05-04T16:31:12.315Z] : [1777912272313]  "GET"  "/__catalyst/sdk/init.js"
+[info] [2026-05-04T16:31:20.214Z] : [1777912280211]  "GET"  "/baas/v1/project/43287000000035021/project-user/current"
+[info] [2026-05-04T16:31:44.781Z] : [1777912304780]  "GET"  "/.well-known/appspecific/com.chrome.devtools.json"
+[info] [2026-05-04T16:32:18.402Z] : [1777912338397]  "GET"  "/accounts/p/10124357406/logout?servicename=ZohoCatalyst&serviceurl=https://vitabotclientapp-ycwjmrpr.onslate.com/"

@@ -12,17 +12,10 @@ import zcatalyst_sdk
 from openai import OpenAI
 from supabase import create_client, Client
 
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-SESSIONS_MANAGEMENT_DIR = os.path.normpath(os.path.join(CURRENT_DIR, "..", "fn_sessions_management"))
-if SESSIONS_MANAGEMENT_DIR not in sys.path:
-    sys.path.append(SESSIONS_MANAGEMENT_DIR)
-
-from users import get_or_create_user
-from sessions import create_session, get_session_by_id, update_session_activity
-from messages import get_messages, save_messages
-
 load_dotenv()
 logger = logging.getLogger(__name__)
+
+SESSIONS_API_URL = "https://vitabotproject-920088613.development.catalystserverless.com/server/fn_sessions_management"
 
 CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
 CLAUDE_MODEL = "claude-haiku-4-5"
@@ -34,7 +27,14 @@ openai_client = OpenAI(api_key=OPENAI_API_KEY)
 
 SUPABASE_URL = os.getenv("PROJECT_DB_URL")
 SUPABASE_KEY = os.getenv("SECRET_DB_API_KEY")
+
+if not SUPABASE_URL or not SUPABASE_KEY:
+    logger.warning("Supabase credentials not fully configured")
+    logger.warning("PROJECT_DB_URL: %s", "SET" if SUPABASE_URL else "NOT SET")
+    logger.warning("SECRET_DB_API_KEY: %s", "SET" if SUPABASE_KEY else "NOT SET")
+
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+logger.info("Supabase client initialized")
 
 MIN_SIMILARITY_THRESHOLD = 0.3
 MAX_CONVERSATION_MESSAGES = 5
@@ -58,10 +58,79 @@ MEMORY_QUESTION_MARKERS = (
     "earlier in this chat",
     "previous message",
 )
-APP_DOMAIN = "https://vitabot-py-20261-kzkxzltd.onslate.com"
+
+
+def call_sessions_api(method, path, data=None, request=None):
+    url = f"{SESSIONS_API_URL}{path}"
+    headers = {"Content-Type": "application/json"}
+    cookies = {}
+
+    if request:
+        # Extraer cookies del request original para autenticación
+        cookie_header = request.headers.get("Cookie", "")
+        if cookie_header:
+            # Parsear cookies simples
+            for cookie in cookie_header.split(";"):
+                if "=" in cookie:
+                    key, value = cookie.strip().split("=", 1)
+                    cookies[key] = value
+
+    try:
+        if method == "GET":
+            response = requests.get(url, headers=headers, params=data, cookies=cookies, timeout=10)
+        elif method == "POST":
+            response = requests.post(url, headers=headers, json=data, cookies=cookies, timeout=10)
+        elif method == "PUT":
+            response = requests.put(url, headers=headers, json=data, cookies=cookies, timeout=10)
+        else:
+            raise ValueError(f"Unsupported method: {method}")
+
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException as e:
+        logger.error(f"Error calling {method} {url}: {str(e)}")
+        raise Exception(f"Failed to call sessions API: {str(e)}")
+
+
+def get_or_create_user(data, request):
+    return call_sessions_api("POST", "/user", data, request)
+
+
+def get_user_by_external_id(external_id, request):
+    return call_sessions_api("GET", "/user", {"external_id": external_id}, request)
+
+
+def create_session(data, request):
+    return call_sessions_api("POST", "/session", data, request)
+
+
+def get_session_by_id(session_id, user_id, request):
+    return call_sessions_api("GET", "/session", {"session_id": session_id, "user_id": user_id}, request)
+
+
+def update_session_activity(data, request):
+    return call_sessions_api("PUT", "/session", data, request)
+
+
+def get_messages(data, request):
+    return call_sessions_api("GET", "/messages", data, request)
+
+
+def save_messages(data, request):
+    return call_sessions_api("POST", "/messages", data, request)
+
+
+def get_user_sessions(user_id, request):
+    return call_sessions_api("GET", "/sessions", {"user_id": user_id}, request)
+APP_DOMAIN = "https://vitabotclientapp-ycwjmrpr.onslate.com"
 
 def add_cors_headers(response, request_origin=None):
-    allowed_origin = request_origin or APP_DOMAIN
+    allowed_origins = {
+        "http://localhost:3001",
+        "https://vitabotclientapp-ycwjmrpr.onslate.com",
+    }
+    allowed_origin = request_origin if request_origin in allowed_origins else "http://localhost:3001"
+
     response.headers["Access-Control-Allow-Origin"] = allowed_origin
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Origin"
@@ -107,9 +176,14 @@ def cosine_similarity(a, b):
 
 def query_similar_documents(embedding, top_k=3):
     try:
+        logger.info("Starting query to Supabase schema 'rag', table 'documents'")
+        logger.info("Supabase URL: %s", SUPABASE_URL[:20] + "..." if SUPABASE_URL else "NOT SET")
+        
         response = supabase.schema("rag").table("documents").select("id, content, embedding, source").execute()
+        logger.info("Supabase response received successfully")
 
         if not response.data:
+            logger.info("No documents found in database")
             return []
 
         user_embedding = np.array(embedding, dtype=np.float32)
@@ -117,6 +191,7 @@ def query_similar_documents(embedding, top_k=3):
 
         for doc in response.data:
             if not doc.get("embedding"):
+                logger.warning("Document ID %s has no embedding, skipping", doc.get("id"))
                 continue
 
             try:
@@ -126,7 +201,7 @@ def query_similar_documents(embedding, top_k=3):
 
                 doc_embedding = np.array(doc_emb, dtype=np.float32)
                 similarity = cosine_similarity(user_embedding, doc_embedding)
-                logger.info("Document ID %s similarity: %.4f", doc["id"], similarity)
+                logger.debug("Document ID %s similarity: %.4f", doc["id"], similarity)
 
                 if similarity >= MIN_SIMILARITY_THRESHOLD:
                     similarities.append({
@@ -137,11 +212,15 @@ def query_similar_documents(embedding, top_k=3):
                     })
             except Exception as doc_error:
                 logger.warning("Error processing document %s: %s", doc.get("id"), str(doc_error))
+                logger.exception("Full traceback for document error:")
 
         similarities.sort(key=lambda x: x["similarity"], reverse=True)
+        logger.info("Returning %s similar documents out of %s total", len(similarities[:top_k]), len(similarities))
         return similarities[:top_k]
 
     except Exception as e:
+        logger.error("Error querying documents: %s", str(e))
+        logger.exception("Full traceback for query_similar_documents:")
         raise Exception(f"Error querying documents: {str(e)}")
 
 
@@ -163,11 +242,11 @@ def is_memory_question(user_message):
     return any(marker in normalized_message for marker in MEMORY_QUESTION_MARKERS)
 
 
-def build_conversation_messages(session_id, user_message):
+def build_conversation_messages(session_id, user_message, request):
     conversation_messages = []
 
     if session_id:
-        previous_messages_response = get_messages({"session_id": session_id})
+        previous_messages_response = get_messages({"session_id": session_id}, request)
         if not previous_messages_response["success"]:
             raise Exception(previous_messages_response["error"])
 
@@ -287,7 +366,7 @@ def resolve_authenticated_user(app):
     }
 
 
-def resolve_optional_authenticated_user(app):
+def resolve_optional_authenticated_user(app, request):
     try:
         auth_user = app.authentication().get_current_user()
     except Exception as exc:
@@ -298,7 +377,10 @@ def resolve_optional_authenticated_user(app):
         return None
 
     external_id = auth_user["user_id"]
-    user_response = get_or_create_user({"external_id": external_id})
+    user_response = get_user_by_external_id(external_id, request)
+    if not user_response["success"] and user_response.get("code") == 404:
+        user_response = get_or_create_user({"external_id": external_id}, request)
+
     if not user_response["success"]:
         logger.warning("Unable to resolve authenticated user: %s", user_response.get("error"))
         return None
@@ -309,31 +391,31 @@ def resolve_optional_authenticated_user(app):
     }
 
 
-def resolve_session(user_id, session_id):
+def resolve_session(user_id, session_id, request):
     if session_id:
-        session_response = get_session_by_id(session_id, user_id)
+        session_response = get_session_by_id(session_id, user_id, request)
         if not session_response["success"]:
             raise Exception(session_response["error"])
         return session_id
 
-    session_response = create_session({"user_id": user_id})
+    session_response = create_session({"user_id": user_id}, request)
     if not session_response["success"]:
         raise Exception(session_response["error"])
 
     return session_response["data"]["session_id"]
 
 
-def persist_conversation(session_id, user_message, bot_response, sources):
+def persist_conversation(session_id, user_message, bot_response, sources, request):
     save_response = save_messages({
         "session_id": session_id,
         "user_content": user_message,
         "bot_content": bot_response,
         "sources": sources
-    })
+    }, request)
     if not save_response["success"]:
         raise Exception(save_response["error"])
 
-    activity_response = update_session_activity({"session_id": session_id})
+    activity_response = update_session_activity({"session_id": session_id}, request)
     if not activity_response["success"]:
         raise Exception(activity_response["error"])
 
@@ -376,14 +458,14 @@ def handler(request: Request):
                 "message": "Message cannot be empty"
             }, 400, request_origin=request_origin)
 
-        user_info = resolve_optional_authenticated_user(app)
+        user_info = resolve_optional_authenticated_user(app, request)
         if user_info:
-            session_id = resolve_session(user_info["user_id"], requested_session_id)
-            conversation_messages = build_conversation_messages(session_id, user_message)
+            session_id = resolve_session(user_info["user_id"], requested_session_id, request)
+            conversation_messages = build_conversation_messages(session_id, user_message, request)
         else:
             logger.info("Guest request received: no authenticated Catalyst user")
             session_id = None
-            conversation_messages = build_conversation_messages(None, user_message)
+            conversation_messages = build_conversation_messages(None, user_message, request)
 
         memory_question = is_memory_question(user_message)
 
@@ -396,8 +478,13 @@ def handler(request: Request):
         embedding = get_embedding(user_message)
 
         logger.info("Querying similar documents from database")
-        similar_docs = query_similar_documents(embedding, top_k=3)
-        logger.info("Found %s similar documents", len(similar_docs))
+        try:
+            similar_docs = query_similar_documents(embedding, top_k=3)
+            logger.info("Found %s similar documents", len(similar_docs))
+        except Exception as query_error:
+            logger.error("Failed to query documents: %s", str(query_error))
+            logger.exception("Full traceback for document query error:")
+            similar_docs = []
 
         context = build_context(similar_docs) if similar_docs else None
         sources = list(set(doc.get("source", "Fuente desconocida") for doc in similar_docs)) if similar_docs else []
@@ -429,7 +516,7 @@ def handler(request: Request):
         }
 
         if user_info:
-            persist_conversation(session_id, user_message, bot_response, sources)
+            persist_conversation(session_id, user_message, bot_response, sources, request)
             response_data.update({
                 "session_id": session_id,
                 "user_id": user_info["user_id"],
