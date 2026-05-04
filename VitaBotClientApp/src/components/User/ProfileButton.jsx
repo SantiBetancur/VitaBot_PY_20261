@@ -5,7 +5,7 @@ import CatalystRegistration from './CatalystRegistration'
 import UserProfile from './UserProfile'
 import { useCatalystSDK } from '../../hooks/useCatalystSDK'
 
-const APP_DOMAIN = import.meta.env.VITE_APP_DOMAIN || 'http://localhost:3001'
+const APP_DOMAIN = "https://vitabot-py-20261-kzkxzltd.onslate.com"
 const REDIRECT_URL = `${APP_DOMAIN}/`
 
 export default function ProfileButton({ openRegisterSignal = 0 }) {

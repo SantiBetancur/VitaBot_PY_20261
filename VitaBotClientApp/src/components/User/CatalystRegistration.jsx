@@ -10,6 +10,7 @@ const CatalystRegistration = ({ onRegistered, onCancel }) => {
   const [status, setStatus] = useState(null)
   const [error, setError] = useState(null)
   const { isReady, error: sdkError } = useCatalystSDK()
+  const APP_DOMAIN = "https://vitabot-py-20261-kzkxzltd.onslate.com"
 
   useEffect(() => {
     if (sdkError) {
@@ -37,7 +38,7 @@ const CatalystRegistration = ({ onRegistered, onCancel }) => {
       return
     }
 
-    const APP_DOMAIN = import.meta.env.VITE_APP_DOMAIN || 'http://localhost:3001'
+   
 
     const signupData = {
       first_name: firstName,

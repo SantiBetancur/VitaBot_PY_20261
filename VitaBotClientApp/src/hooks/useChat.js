@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { useChatContext, ACTIONS } from '../context/Chatcontext'
 
-const URL = "http://localhost:3000/server/vitabot_endpoint_function"
+const URL = "https://vitabotproject-920088613.development.catalystserverless.com/server/vitabot_endpoint_function/"
 
 export function useChat() {
   const { state, dispatch, createChat, getChatById } = useChatContext()
