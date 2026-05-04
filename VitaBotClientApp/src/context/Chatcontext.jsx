@@ -1,6 +1,6 @@
 import { createContext, useContext, useReducer, useCallback, useEffect, useRef } from 'react'
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_DOMAIN || 'http://localhost:3000'
+const BACKEND_URL = 'http://localhost:3000'
 const SESSIONS_API_URL = `${BACKEND_URL}/server/fn_sessions_management`
 
 const initialState = {
