@@ -1,6 +1,6 @@
 import { createContext, useContext, useReducer, useCallback, useEffect, useRef } from 'react'
 
-const BACKEND_URL = "https://vitabotproject-920088613.development.catalystserverless.com"
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 const SESSIONS_API_URL = `${BACKEND_URL}/server/fn_sessions_management`
 
 const initialState = {

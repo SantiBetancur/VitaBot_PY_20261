@@ -15,7 +15,7 @@ from supabase import create_client, Client
 load_dotenv()
 logger = logging.getLogger(__name__)
 
-SESSIONS_API_URL = "https://vitabotproject-920088613.development.catalystserverless.com/server/fn_sessions_management"
+SESSIONS_API_URL = f"{os.getenv('BACKEND_URL')}/server/fn_sessions_management"
 
 CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
 CLAUDE_MODEL = "claude-haiku-4-5"

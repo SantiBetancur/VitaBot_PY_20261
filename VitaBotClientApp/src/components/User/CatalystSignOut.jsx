@@ -1,6 +1,6 @@
 import { useCatalystSDK } from '../../hooks/useCatalystSDK'
 
-const APP_DOMAIN = "https://vitabotclientapp-ycwjmrpr.onslate.com"
+const APP_DOMAIN = import.meta.env.VITE_APP_DOMAIN
 const REDIRECT_URL = `${APP_DOMAIN}/`
 
 const CatalystSignOut = ({ onSignOut }) => {

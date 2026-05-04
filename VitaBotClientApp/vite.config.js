@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
-const BACKEND_URL = 'https://vitabotproject-920088613.development.catalystserverless.com'
+const BACKEND_URL = 'http://localhost:3000'
 export default defineConfig({
   plugins: [react()],
   server: {
