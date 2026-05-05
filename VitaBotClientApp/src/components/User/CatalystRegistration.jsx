@@ -10,8 +10,12 @@ const CatalystRegistration = ({ onRegistered, onCancel }) => {
   const [status, setStatus] = useState(null)
   const [error, setError] = useState(null)
   const { isReady, error: sdkError } = useCatalystSDK()
-  const APP_DOMAIN = import.meta.env.VITE_APP_DOMAIN
-
+  let APP_DOMAIN = null
+  if (import.meta.env.VITE_ENVIRONMENT === 'development') {
+    APP_DOMAIN = import.meta.env.VITE_APP_DOMAIN_DEV
+  } else {
+    APP_DOMAIN = import.meta.env.VITE_APP_DOMAIN_PRODUCTION
+  }
   useEffect(() => {
     if (sdkError) {
       setError(sdkError)

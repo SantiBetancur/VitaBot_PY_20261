@@ -5,18 +5,13 @@ import os
 import sys
 
 from flask import Request, make_response, jsonify
-from dotenv import load_dotenv
 import numpy as np
 import requests
 import zcatalyst_sdk
 from openai import OpenAI
 from supabase import create_client, Client
 
-load_dotenv()
 logger = logging.getLogger(__name__)
-
-SESSIONS_API_URL = f"{os.getenv('BACKEND_URL')}/server/fn_sessions_management"
-
 CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
 CLAUDE_MODEL = "claude-haiku-4-5"
 CLAUDE_API_URL = "https://api.anthropic.com/v1/messages"
@@ -27,6 +22,34 @@ openai_client = OpenAI(api_key=OPENAI_API_KEY)
 
 SUPABASE_URL = os.getenv("PROJECT_DB_URL")
 SUPABASE_KEY = os.getenv("SECRET_DB_API_KEY")
+
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+
+if ENVIRONMENT == "development":
+    APP_DOMAIN = os.getenv("APP_DOMAIN_DEV", "http://localhost:3001")
+    BACKEND_URL = os.getenv("BACKEND_URL_DEV", "http://localhost:3000")
+    SESSIONS_API_URL = f"{BACKEND_URL}/server/fn_sessions_management"
+else:
+     APP_DOMAIN = os.getenv("APP_DOMAIN_PRODUCTION", "https://vitabotclientapp-ycwjmrpr.onslate.com")
+     BACKEND_URL = os.getenv("BACKEND_URL_PRODUCTION", "https://vitabotproject-920088613.development.catalystserverless.com")    
+     SESSIONS_API_URL = f"{BACKEND_URL}/server/fn_sessions_management"
+
+
+def add_cors_headers(response, request_origin=None):
+    allowed_origins = {
+        APP_DOMAIN
+    }
+    logger = logging.getLogger()
+    logger.info(f"Request origin: {request_origin}")
+    allowed_origin = request_origin if request_origin in allowed_origins else "http://localhost:3001"
+    if request_origin == "http://localhost:3001":
+        response.headers["Access-Control-Allow-Origin"] = allowed_origin
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Origin"
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        response.headers["Access-Control-Max-Age"] = "3600"
+        response.headers["Vary"] = "Origin"
+    return response
 
 if not SUPABASE_URL or not SUPABASE_KEY:
     logger.warning("Supabase credentials not fully configured")
@@ -122,22 +145,7 @@ def save_messages(data, request):
 
 def get_user_sessions(user_id, request):
     return call_sessions_api("GET", "/sessions", {"user_id": user_id}, request)
-APP_DOMAIN = "https://vitabotclientapp-ycwjmrpr.onslate.com"
 
-def add_cors_headers(response, request_origin=None):
-    allowed_origins = {
-        "http://localhost:3001",
-        "https://vitabotclientapp-ycwjmrpr.onslate.com",
-    }
-    allowed_origin = request_origin if request_origin in allowed_origins else "http://localhost:3001"
-
-    response.headers["Access-Control-Allow-Origin"] = allowed_origin
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Origin"
-    response.headers["Access-Control-Allow-Credentials"] = "true"
-    response.headers["Access-Control-Max-Age"] = "3600"
-    response.headers["Vary"] = "Origin"
-    return response
 
 
 def build_json_response(payload, status_code, request_origin=None):

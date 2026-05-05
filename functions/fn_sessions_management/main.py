@@ -2,16 +2,27 @@ import logging
 from flask import Request, make_response, jsonify
 import zcatalyst_sdk
 
+import os
 from users import get_or_create_user, get_user_by_external_id
 from sessions import create_session, update_session_activity, delete_session, get_user_sessions
 from messages import get_messages, save_messages, get_user_messages
-APP_DOMAIN = "https://vitabotclientapp-ycwjmrpr.onslate.com"
+
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+
+if ENVIRONMENT == "development":
+    APP_DOMAIN = os.getenv("APP_DOMAIN_DEV", "http://localhost:3001")
+    BACKEND_URL = os.getenv("BACKEND_URL_DEV", "http://localhost:3000")
+else:
+     APP_DOMAIN = os.getenv("APP_DOMAIN_PRODUCTION", "https://vitabotclientapp-ycwjmrpr.onslate.com")
+     BACKEND_URL = os.getenv("BACKEND_URL_PRODUCTION", "https://vitabotproject-920088613.development.catalystserverless.com")    
+
 
 def add_cors_headers(response, request_origin=None):
     allowed_origins = {
-        "http://localhost:3001",
-        "https://vitabotclientapp-ycwjmrpr.onslate.com",
+        APP_DOMAIN
     }
+    logger = logging.getLogger(__name__)
+    logger.info(f"Request origin: {request_origin}")
     allowed_origin = request_origin if request_origin in allowed_origins else "http://localhost:3001"
     if request_origin == "http://localhost:3001":
         response.headers["Access-Control-Allow-Origin"] = allowed_origin

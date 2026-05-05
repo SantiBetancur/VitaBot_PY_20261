@@ -1,7 +1,11 @@
 import { useCallback } from 'react'
 import { useChatContext, ACTIONS } from '../context/Chatcontext'
-
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
+let BACKEND_URL = null
+if (import.meta.env.VITE_ENVIRONMENT === 'development') {
+  BACKEND_URL = import.meta.env.VITE_BACKEND_URL_DEV
+} else {
+  BACKEND_URL = import.meta.env.VITE_BACKEND_URL_PRODUCTION
+}
 const URL = `${BACKEND_URL}/server/vitabot_endpoint_function`
 
 export function useChat() {

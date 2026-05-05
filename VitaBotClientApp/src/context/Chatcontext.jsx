@@ -1,6 +1,11 @@
 import { createContext, useContext, useReducer, useCallback, useEffect, useRef } from 'react'
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
+let BACKEND_URL = null
+if (import.meta.env.VITE_ENVIRONMENT === 'development') {
+  BACKEND_URL = import.meta.env.VITE_BACKEND_URL_DEV
+} else {
+  BACKEND_URL = import.meta.env.VITE_BACKEND_URL_PRODUCTION
+}
 const SESSIONS_API_URL = `${BACKEND_URL}/server/fn_sessions_management`
 
 const initialState = {

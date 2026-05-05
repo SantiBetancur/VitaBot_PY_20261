@@ -1,6 +1,11 @@
 import { useCatalystSDK } from '../../hooks/useCatalystSDK'
 
-const APP_DOMAIN = import.meta.env.VITE_APP_DOMAIN
+let APP_DOMAIN = null
+if (import.meta.env.VITE_ENVIRONMENT === 'development') {
+  APP_DOMAIN = import.meta.env.VITE_APP_DOMAIN_DEV
+} else {
+  APP_DOMAIN = import.meta.env.VITE_APP_DOMAIN_PRODUCTION
+}
 const REDIRECT_URL = `${APP_DOMAIN}/`
 
 const CatalystSignOut = ({ onSignOut }) => {

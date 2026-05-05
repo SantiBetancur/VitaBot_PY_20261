@@ -5,9 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:prod": "VITE_ENVIRONMENT=production vite",
     "build": "vite build",
-    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "build:prod": "VITE_ENVIRONMENT=production vite build",
+    "preview": "vite preview",
+    "debug:env": "node -e \"console.log('Environment variables:'); console.log('VITE_ENVIRONMENT:', process.env.VITE_ENVIRONMENT); console.log('VITE_BACKEND_URL_DEV:', process.env.VITE_BACKEND_URL_DEV); console.log('VITE_BACKEND_URL_PRODUCTION:', process.env.VITE_BACKEND_URL_PRODUCTION);\"",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
     "react": "^18.3.1",
