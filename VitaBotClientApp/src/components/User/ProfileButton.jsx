@@ -98,6 +98,13 @@ export default function ProfileButton({ openRegisterSignal = 0 }) {
 
   const handleRegisterSuccess = (userDetails) => {
     console.log('Usuario registrado:', userDetails)
+    const errorCode = userDetails?.error_code || userDetails?.econtent?.error_code
+    if (errorCode) {
+      alert(`Error al registrar: ${userDetails?.message || errorCode}`)
+      return
+    }
+
+
     setShowLoginModal(false)
     setShowRegister(false)
     alert('Usuario registrado correctamente. Revisa el correo para confirmar la invitación.')

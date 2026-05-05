@@ -6,7 +6,7 @@ if (import.meta.env.VITE_ENVIRONMENT === 'development') {
 } else {
   APP_DOMAIN = import.meta.env.VITE_APP_DOMAIN_PRODUCTION
 }
-const REDIRECT_URL = `${APP_DOMAIN}/`
+const REDIRECT_URL = `${APP_DOMAIN}`
 
 const CatalystSignOut = ({ onSignOut }) => {
   const { isReady, catalyst } = useCatalystSDK()

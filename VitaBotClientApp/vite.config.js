@@ -34,15 +34,14 @@ const BACKEND_URL = ENVIRONMENT === 'production'
 console.log(`🚀 Vite config - Environment: ${ENVIRONMENT}`)
 console.log(`🔗 Backend URL: ${BACKEND_URL}`)
 console.log(`📝 Loaded env vars:`, envVars)
-
+// vite.config.js — solo sirve para dev
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 4800,
-    strictPort: true,
+    port: 3001,
     proxy: {
       '/server': {
-        target: BACKEND_URL,
+        target: 'http://localhost:3000',
         changeOrigin: true,
       },
     },

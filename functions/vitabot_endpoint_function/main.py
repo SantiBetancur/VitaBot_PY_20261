@@ -37,18 +37,36 @@ else:
 
 def add_cors_headers(response, request_origin=None):
     allowed_origins = {
-        APP_DOMAIN
+        APP_DOMAIN,
+        "http://localhost:3001",  # Para desarrollo local
     }
-    logger = logging.getLogger()
-    logger.info(f"Request origin: {request_origin}")
-    allowed_origin = request_origin if request_origin in allowed_origins else "http://localhost:3001"
-    if request_origin == "http://localhost:3001":
+
+    logger = logging.getLogger(__name__)
+    logger.info(f"APP_DOMAIN value: '{APP_DOMAIN}'")
+    logger.info(f"Request origin: '{request_origin}'")
+
+    # Determinar el origen permitido
+    if request_origin and request_origin in allowed_origins:
+        allowed_origin = request_origin
+    else:
+        allowed_origin = "http://localhost:3001"  # fallback por defecto
+
+    # Solo agregar headers CORS si el origen está permitido
+    if request_origin in allowed_origins:
+        # Remover cualquier header existente para evitar duplicados
+        if "Access-Control-Allow-Origin" in response.headers:
+            del response.headers["Access-Control-Allow-Origin"]
+        response.headers.pop("Access-Control-Allow-Origin", None)
         response.headers["Access-Control-Allow-Origin"] = allowed_origin
         response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
         response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Origin"
         response.headers["Access-Control-Allow-Credentials"] = "true"
         response.headers["Access-Control-Max-Age"] = "3600"
         response.headers["Vary"] = "Origin"
+
+        logger.info(f"CORS headers added for origin: {allowed_origin}")
+        logger.debug(f"Response headers after adding CORS: {response.headers}")
+
     return response
 
 if not SUPABASE_URL or not SUPABASE_KEY:

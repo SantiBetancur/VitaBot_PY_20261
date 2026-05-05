@@ -33,12 +33,12 @@ const CatalystRegistration = ({ onRegistered, onCancel }) => {
     }
 
     if (!isReady) {
-      setError('Catalyst SDK aún no está listo. Espera un momento.')
+      setError('Espera un momento.')
       return
     }
 
     if (!window.catalyst || !window.catalyst.auth) {
-      setError('Catalyst auth no está disponible. Asegúrate de que el init script se cargue correctamente.')
+      setError('Función no disponible.')
       return
     }
 
@@ -49,7 +49,7 @@ const CatalystRegistration = ({ onRegistered, onCancel }) => {
       last_name: lastName,
       email_id: email,
       platform_type: 'web',
-      redirect_url: `${APP_DOMAIN}/`
+      redirect_url: `${APP_DOMAIN}`
     }
 
     try {
@@ -57,8 +57,18 @@ const CatalystRegistration = ({ onRegistered, onCancel }) => {
       const auth = window.catalyst.auth
       const signupPromise = auth.signUp(signupData)
       const response = await signupPromise
-      
-      const userDetails = response.content || response
+      console.log('Respuesta del registro:', response)
+      console.log("SIGNUP DATA ENVIADA:", signupData)
+      const userDetails = response?.content || response
+      const errorCode = userDetails?.error_code || userDetails?.econtent?.error_code
+      const errorMessage = userDetails?.message || userDetails?.econtent?.message || (errorCode && `Error de registro: ${errorCode}`)
+
+      if (errorCode || response?.status >= 400) {
+        console.warn('Catalyst retornó un error de registro:', userDetails)
+        setError(errorMessage || 'Error al crear el usuario en Catalyst.')
+        return
+      }
+
       setStatus(userDetails)
       onRegistered && onRegistered(userDetails)
     } catch (submitError) {
@@ -88,10 +98,7 @@ const CatalystRegistration = ({ onRegistered, onCancel }) => {
 
       {status && (
         <div className={`${styles.statusMessage} ${styles.success}`}>
-          <strong>Registro completado:</strong>
-          <pre style={{ overflowX: 'auto', margin: '8px 0 0' }}>
-            {JSON.stringify(status, null, 2)}
-          </pre>
+          <strong>Por favor revise su correo electrónico para confirmar la cuenta</strong>
         </div>
       )}
 
