@@ -7,14 +7,14 @@ from users import get_or_create_user, get_user_by_external_id
 from sessions import create_session, update_session_activity, delete_session, get_user_sessions
 from messages import get_messages, save_messages, get_user_messages
 
-ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+ENVIRONMENT = os.getenv("ENVIRONMENT")
 
 if ENVIRONMENT == "development":
-    APP_DOMAIN = os.getenv("APP_DOMAIN_DEV", "http://localhost:3001")
-    BACKEND_URL = os.getenv("BACKEND_URL_DEV", "http://localhost:3000")
+    APP_DOMAIN = os.getenv("APP_DOMAIN_DEV")
+    BACKEND_URL = os.getenv("BACKEND_URL_DEV")
 else:
-     APP_DOMAIN = os.getenv("APP_DOMAIN_PRODUCTION", "https://vitabotclientapp-ycwjmrpr.onslate.com")
-     BACKEND_URL = os.getenv("BACKEND_URL_PRODUCTION", "https://vitabotproject-920088613.development.catalystserverless.com")    
+     APP_DOMAIN = os.getenv("APP_DOMAIN_PRODUCTION")
+     BACKEND_URL = os.getenv("BACKEND_URL_PRODUCTION")    
 
 
 def add_cors_headers(response, request_origin=None):
@@ -24,8 +24,10 @@ def add_cors_headers(response, request_origin=None):
     }
 
     logger = logging.getLogger(__name__)
+    logger.info(f"Current Environment: {ENVIRONMENT}")
     logger.info(f"APP_DOMAIN value: '{APP_DOMAIN}'")
     logger.info(f"Request origin: '{request_origin}'")
+    
 
     # Determinar el origen permitido
     if request_origin and request_origin in allowed_origins:
@@ -66,13 +68,16 @@ def respond(payload, request_origin=None):
 
 
 def handler(request: Request):
+    logger = logging.getLogger()
     request_origin = request.headers.get("Origin")
-
+    logger.info(f"Method: {request.method}, Path: {request.path}")
+    # Manejar preflight OPTIONS requests antes de cualquier otra lógica
     if request.method == "OPTIONS":
-        return add_cors_headers(make_response("", 200), request_origin=request_origin)
+        response = make_response("", 200)
+        return add_cors_headers(response, request_origin=request_origin)
 
     app = zcatalyst_sdk.initialize()
-    logger = logging.getLogger()
+   
 
     try:
         data = parse_request_data(request)
@@ -153,7 +158,10 @@ def handler(request: Request):
             return respond(update_session_activity(data), request_origin=request_origin)
 
         if path == "/session" and method == "DELETE":
-            return respond(delete_session(data), request_origin=request_origin)
+            logger.info(f"Request to delete session with data: {data}")
+            delete_response = respond(delete_session(data), request_origin=request_origin)
+            logger.info(f"Delete session response: {delete_response}")
+            return delete_response
 
         if path == "/sessions" and method == "GET":
             return respond(get_user_sessions(db_user_id), request_origin=request_origin)
