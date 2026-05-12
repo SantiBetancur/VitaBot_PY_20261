@@ -30,44 +30,12 @@ if ENVIRONMENT == "development":
     BACKEND_URL = os.getenv("BACKEND_URL_DEV", "http://localhost:3000")
     SESSIONS_API_URL = f"{BACKEND_URL}/server/fn_sessions_management"
 else:
-     APP_DOMAIN = os.getenv("APP_DOMAIN_PRODUCTION", "https://vitabotclientapp-ycwjmrpr.onslate.com")
-     BACKEND_URL = os.getenv("BACKEND_URL_PRODUCTION", "https://vitabotproject-920088613.development.catalystserverless.com")    
+     APP_DOMAIN = os.getenv("APP_DOMAIN_PRODUCTION")
+     BACKEND_URL = os.getenv("BACKEND_URL_PRODUCTION")    
      SESSIONS_API_URL = f"{BACKEND_URL}/server/fn_sessions_management"
 
 
-def add_cors_headers(response, request_origin=None):
-    allowed_origins = {
-        APP_DOMAIN,
-        "http://localhost:3001",  # Para desarrollo local
-    }
 
-    logger = logging.getLogger(__name__)
-    logger.info(f"APP_DOMAIN value: '{APP_DOMAIN}'")
-    logger.info(f"Request origin: '{request_origin}'")
-
-    # Determinar el origen permitido
-    if request_origin and request_origin in allowed_origins:
-        allowed_origin = request_origin
-    else:
-        allowed_origin = "http://localhost:3001"  # fallback por defecto
-
-    # Solo agregar headers CORS si el origen está permitido
-    if request_origin in allowed_origins:
-        # Remover cualquier header existente para evitar duplicados
-        if "Access-Control-Allow-Origin" in response.headers:
-            del response.headers["Access-Control-Allow-Origin"]
-        response.headers.pop("Access-Control-Allow-Origin", None)
-        response.headers["Access-Control-Allow-Origin"] = allowed_origin
-        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Origin"
-        response.headers["Access-Control-Allow-Credentials"] = "true"
-        response.headers["Access-Control-Max-Age"] = "3600"
-        response.headers["Vary"] = "Origin"
-
-        logger.info(f"CORS headers added for origin: {allowed_origin}")
-        logger.debug(f"Response headers after adding CORS: {response.headers}")
-
-    return response
 
 if not SUPABASE_URL or not SUPABASE_KEY:
     logger.warning("Supabase credentials not fully configured")
@@ -115,7 +83,10 @@ def call_sessions_api(method, path, data=None, request=None):
                 if "=" in cookie:
                     key, value = cookie.strip().split("=", 1)
                     cookies[key] = value
-
+                    
+        auth_header = request.headers.get("Authorization", "")
+        if auth_header.startswith("Bearer "):
+            headers["Authorization"] = auth_header
     try:
         if method == "GET":
             response = requests.get(url, headers=headers, params=data, cookies=cookies, timeout=10)
@@ -123,6 +94,8 @@ def call_sessions_api(method, path, data=None, request=None):
             response = requests.post(url, headers=headers, json=data, cookies=cookies, timeout=10)
         elif method == "PUT":
             response = requests.put(url, headers=headers, json=data, cookies=cookies, timeout=10)
+        elif method == "DELETE":
+            response = requests.delete(url, headers=headers, params=data, cookies=cookies, timeout=10)
         else:
             raise ValueError(f"Unsupported method: {method}")
 
@@ -165,10 +138,14 @@ def get_user_sessions(user_id, request):
     return call_sessions_api("GET", "/sessions", {"user_id": user_id}, request)
 
 
+def delete_session(session_id, request):
+    return call_sessions_api("DELETE", "/session", {"session_id": session_id}, request)
 
-def build_json_response(payload, status_code, request_origin=None):
+
+
+def build_json_response(payload, status_code):
     response = make_response(jsonify(payload), status_code)
-    return add_cors_headers(response, request_origin=request_origin)
+    return response
 
 
 def parse_request_data(request: Request):
@@ -268,7 +245,7 @@ def is_memory_question(user_message):
     return any(marker in normalized_message for marker in MEMORY_QUESTION_MARKERS)
 
 
-def build_conversation_messages(session_id, user_message, request):
+def build_conversation_messages(session_id, user_message, request, chat_history=None):
     conversation_messages = []
 
     if session_id:
@@ -277,18 +254,23 @@ def build_conversation_messages(session_id, user_message, request):
             raise Exception(previous_messages_response["error"])
 
         previous_messages = previous_messages_response.get("data", [])
-        trimmed_messages = previous_messages[-MAX_CONVERSATION_MESSAGES:]
+    elif chat_history:
+        previous_messages = chat_history
+    else:
+        previous_messages = []
 
-        for message in trimmed_messages:
-            role = message.get("role")
-            content = (message.get("content") or "").strip()
-            if role not in {"user", "assistant"} or not content:
-                continue
+    trimmed_messages = previous_messages[-MAX_CONVERSATION_MESSAGES:]
 
-            conversation_messages.append({
-                "role": role,
-                "content": content
-            })
+    for message in trimmed_messages:
+        role = message.get("role")
+        content = (message.get("content") or "").strip()
+        if role not in {"user", "assistant"} or not content:
+            continue
+
+        conversation_messages.append({
+            "role": role,
+            "content": content
+        })
 
     conversation_messages.append({
         "role": "user",
@@ -371,7 +353,7 @@ Reglas generales:
         raise Exception(f"Error calling Claude API: {str(e)}")
 
 
-def resolve_authenticated_user(app):
+def resolve_authenticated_user(app, request):
     auth_user = app.authentication().get_current_user()
     if not auth_user:
         raise Exception("Catalyst no devolvio un usuario autenticado")
@@ -382,7 +364,7 @@ def resolve_authenticated_user(app):
 
     external_id = auth_user["user_id"]
 
-    user_response = get_or_create_user({"external_id": external_id})
+    user_response = get_or_create_user({"external_id": external_id}, request)
     if not user_response["success"]:
         raise Exception(user_response["error"])
 
@@ -393,6 +375,11 @@ def resolve_authenticated_user(app):
 
 
 def resolve_optional_authenticated_user(app, request):
+  
+    auth_header = request.headers.get("Authorization", "")
+    has_bearer = auth_header.startswith("Bearer ")
+    logger.info(f"Auth header present: {bool(auth_header)}, has Bearer token: {has_bearer}")
+
     try:
         auth_user = app.authentication().get_current_user()
     except Exception as exc:
@@ -447,17 +434,15 @@ def persist_conversation(session_id, user_message, bot_response, sources, reques
 
 
 def handler(request: Request):
-    app = zcatalyst_sdk.initialize()
+    app = zcatalyst_sdk.initialize(request)
     request_origin = request.headers.get("Origin")
-
-    if request.method == "OPTIONS":
-        return add_cors_headers(make_response("", 200), request_origin=request_origin)
+    logger.info(f"Incoming request: {request.method} {request.path} from origin: {request_origin} to VitaBot endpoint")
 
     if request.path == "/" or request.path == "":
         return build_json_response({
             "status": "success",
             "message": "Hello from VitaBot endpoint"
-        }, 200, request_origin=request_origin)
+        }, 200)
 
     if request.path == "/cache":
         try:
@@ -465,24 +450,70 @@ def handler(request: Request):
             insert_resp = default_segment.put("Name", "DefaultName")
             logger.info("Inserted cache: %s", insert_resp)
             get_resp = default_segment.get("Name")
-            return build_json_response(get_resp, 200, request_origin=request_origin)
+            return build_json_response(get_resp, 200)
         except Exception as e:
             logger.error("Cache error: %s", str(e))
-            return build_json_response({"error": str(e)}, 500, request_origin=request_origin)
+            return build_json_response({"error": str(e)}, 500)
+
+    # ── Proxy autenticado hacia fn_sessions_management ──────────────────────
+    # El cliente SOLO debe llamar a esta función; ella reenvía con las cookies
+    # de Catalyst ya validadas, garantizando autenticación y CORS correctos.
+
+    if request.path == "/sessions" and request.method == "GET":
+        try:
+            user_info = resolve_optional_authenticated_user(app, request)
+            if not user_info:
+                return build_json_response({"error": "Unauthorized"}, 401)
+            result = get_user_sessions(user_info["user_id"], request)
+            return build_json_response(result, 200)
+        except Exception as e:
+            logger.error("Error fetching sessions: %s", str(e))
+            return build_json_response({"error": str(e)}, 500)
+
+    if request.path == "/messages" and request.method == "GET":
+        try:
+            user_info = resolve_optional_authenticated_user(app, request)
+            if not user_info:
+                return build_json_response({"error": "Unauthorized"}, 401)
+            session_id = request.args.get("session_id")
+            if not session_id:
+                return build_json_response({"error": "session_id is required"}, 400)
+            result = get_messages({"session_id": session_id}, request)
+            return build_json_response(result, 200)
+        except Exception as e:
+            logger.error("Error fetching messages: %s", str(e))
+            return build_json_response({"error": str(e)}, 500)
+
+    if request.path == "/session" and request.method == "DELETE":
+        try:
+            user_info = resolve_optional_authenticated_user(app, request)
+            if not user_info:
+                return build_json_response({"error": "Unauthorized"}, 401)
+            session_id = request.args.get("session_id")
+            if not session_id:
+                return build_json_response({"error": "session_id is required"}, 400)
+            result = delete_session(session_id, request)
+            return build_json_response(result, 200)
+        except Exception as e:
+            logger.error("Error deleting session: %s", str(e))
+            return build_json_response({"error": str(e)}, 500)
+
+    # ────────────────────────────────────────────────────────────────────────
 
     if request.path != "/message" or request.method != "POST":
-        return build_json_response({"error": "Unknown path"}, 400, request_origin=request_origin)
+        return build_json_response({"error": "Unknown path"}, 400)
 
     try:
         data = parse_request_data(request)
         user_message = (data.get("message") or "").strip()
         requested_session_id = data.get("session_id")
+        chat_history = data.get("chat_history")
 
         if not user_message:
             return build_json_response({
                 "status": "error",
                 "message": "Message cannot be empty"
-            }, 400, request_origin=request_origin)
+            }, 400)
 
         user_info = resolve_optional_authenticated_user(app, request)
         if user_info:
@@ -491,7 +522,7 @@ def handler(request: Request):
         else:
             logger.info("Guest request received: no authenticated Catalyst user")
             session_id = None
-            conversation_messages = build_conversation_messages(None, user_message, request)
+            conversation_messages = build_conversation_messages(None, user_message, request, chat_history=chat_history)
 
         memory_question = is_memory_question(user_message)
 
@@ -553,11 +584,11 @@ def handler(request: Request):
                 "session_id": None
             })
 
-        return build_json_response(response_data, 200, request_origin=request_origin)
+        return build_json_response(response_data, 200)
 
     except Exception as e:
         logger.error("Error processing message: %s", str(e))
         return build_json_response({
             "status": "error",
             "message": str(e)
-        }, 500, request_origin=request_origin)
+        }, 500)

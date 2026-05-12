@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 import { useChatContext, ACTIONS } from '../context/Chatcontext'
+import { getAuthToken } from './useCatalystSDK'
 let BACKEND_URL = null
 if (import.meta.env.VITE_ENVIRONMENT === 'development') {
   BACKEND_URL = import.meta.env.VITE_BACKEND_URL_DEV
@@ -7,6 +8,7 @@ if (import.meta.env.VITE_ENVIRONMENT === 'development') {
   BACKEND_URL = import.meta.env.VITE_BACKEND_URL_PRODUCTION
 }
 const URL = `${BACKEND_URL}/server/vitabot_endpoint_function`
+
 
 export function useChat() {
   const { state, dispatch, createChat, getChatById } = useChatContext()
@@ -23,6 +25,7 @@ export function useChat() {
 
     const chat = getChatById(resolvedChatId)
     const currentSessionId = chat?.sessionId ?? null
+    const priorMessages = chat?.messages ?? []
 
     const userMessage = {
       id: `msg_${Date.now()}`,
@@ -44,12 +47,17 @@ export function useChat() {
       const response = await fetch(`${URL}/message`, {
         method: 'POST',
         credentials: 'include',
-        headers: { 'Content-Type': 'text/plain' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${await getAuthToken()}`
+        },
         body: JSON.stringify({
           message: trimmed,
           session_id: currentSessionId,
+          chat_history: priorMessages.map(({ role, content }) => ({ role, content })),
         }),
       })
+      console.log('Response payload:', response)
 
       if (!response.ok) {
         const err = await response.json().catch(() => ({}))

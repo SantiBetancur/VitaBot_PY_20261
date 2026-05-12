@@ -1,12 +1,12 @@
 import { createContext, useContext, useReducer, useCallback, useEffect, useRef } from 'react'
-
+import { getAuthToken } from '../hooks/useCatalystSDK'
 let BACKEND_URL = null
 if (import.meta.env.VITE_ENVIRONMENT === 'development') {
   BACKEND_URL = import.meta.env.VITE_BACKEND_URL_DEV
 } else {
   BACKEND_URL = import.meta.env.VITE_BACKEND_URL_PRODUCTION
 }
-const SESSIONS_API_URL = `${BACKEND_URL}/server/fn_sessions_management`
+const API_URL = `${BACKEND_URL}/server/vitabot_endpoint_function`
 
 const initialState = {
   chats: [],
@@ -144,9 +144,13 @@ export function ChatProvider({ children }) {
     const hydrateChats = async () => {
       dispatch({ type: ACTIONS.SET_LOADING_HISTORY, payload: true })
       try {
-        const sessionsResponse = await fetch(`${SESSIONS_API_URL}/sessions`, {
+        const sessionsResponse = await fetch(`${API_URL}/sessions`, {
           method: 'GET',
           credentials: 'include',
+          headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${await getAuthToken()}`
+                  }
         })
 
         if (sessionsResponse.status === 401) {
@@ -166,10 +170,14 @@ export function ChatProvider({ children }) {
         const hydratedChats = await Promise.all(
           sessions.map(async (session) => {
             const messagesResponse = await fetch(
-              `${SESSIONS_API_URL}/messages?session_id=${encodeURIComponent(session.id)}`,
+              `${API_URL}/messages?session_id=${encodeURIComponent(session.id)}`,
               {
                 method: 'GET',
                 credentials: 'include',
+                headers: { 
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${await getAuthToken()}`
+                },
               }
             )
 
@@ -214,10 +222,14 @@ export function ChatProvider({ children }) {
     if (chat?.sessionId && state.isAuthenticated !== false) {
       try {
         const response = await fetch(
-          `${SESSIONS_API_URL}/session?session_id=${encodeURIComponent(chat.sessionId)}`,
+          `${API_URL}/session?session_id=${encodeURIComponent(chat.sessionId)}`,
           {
             method: 'DELETE',
             credentials: 'include',
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${await getAuthToken()}`
+            }
           }
         )
 

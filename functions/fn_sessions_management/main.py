@@ -17,43 +17,6 @@ else:
      BACKEND_URL = os.getenv("BACKEND_URL_PRODUCTION")    
 
 
-def add_cors_headers(response, request_origin=None):
-    allowed_origins = {
-        APP_DOMAIN,
-        "http://localhost:3001",  # Para desarrollo local
-    }
-
-    logger = logging.getLogger(__name__)
-    logger.info(f"Current Environment: {ENVIRONMENT}")
-    logger.info(f"APP_DOMAIN value: '{APP_DOMAIN}'")
-    logger.info(f"Request origin: '{request_origin}'")
-    
-
-    # Determinar el origen permitido
-    if request_origin and request_origin in allowed_origins:
-        allowed_origin = request_origin
-    else:
-        allowed_origin = "http://localhost:3001"  # fallback por defecto
-
-    # Solo agregar headers CORS si el origen está permitido
-    if request_origin in allowed_origins:
-        # Remover cualquier header existente para evitar duplicados
-        if "Access-Control-Allow-Origin" in response.headers:
-            del response.headers["Access-Control-Allow-Origin"]
-        response.headers.pop("Access-Control-Allow-Origin", None)
-        response.headers["Access-Control-Allow-Origin"] = allowed_origin
-        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Origin"
-        response.headers["Access-Control-Allow-Credentials"] = "true"
-        response.headers["Access-Control-Max-Age"] = "3600"
-        response.headers["Vary"] = "Origin"
-
-        logger.info(f"CORS headers added for origin: {allowed_origin}")
-        logger.debug(f"Response headers after adding CORS: {response.headers}")
-
-    return response
-
-
 def parse_request_data(request: Request):
     if request.method in ["GET", "DELETE"]:
         return request.args.to_dict()
@@ -62,21 +25,17 @@ def parse_request_data(request: Request):
     return {}
 
 
-def respond(payload, request_origin=None):
+def respond(payload):
     response = make_response(jsonify(payload), payload.get("code", 200))
-    return add_cors_headers(response, request_origin=request_origin)
+    return response
 
 
 def handler(request: Request):
     logger = logging.getLogger()
     request_origin = request.headers.get("Origin")
     logger.info(f"Method: {request.method}, Path: {request.path}")
-    # Manejar preflight OPTIONS requests antes de cualquier otra lógica
-    if request.method == "OPTIONS":
-        response = make_response("", 200)
-        return add_cors_headers(response, request_origin=request_origin)
 
-    app = zcatalyst_sdk.initialize()
+    app = zcatalyst_sdk.initialize(request)
    
 
     try:
@@ -101,7 +60,7 @@ def handler(request: Request):
                 if user_response["success"]:
                     db_user_id = user_response["data"]["user_id"]
                 else:
-                    return respond(user_response, request_origin=request_origin)
+                    return respond(user_response)
 
             except Exception as e:
                 logger.error(f"Error en autenticacion: {str(e)}")
@@ -110,14 +69,14 @@ def handler(request: Request):
                     "code": 401,
                     "error": "Usuario no autenticado en Catalyst"
                 }), 401)
-                return add_cors_headers(response, request_origin=request_origin)
+                return response
 
         if path == "/" and method == "GET":
             response = make_response(jsonify({
                 "status": "success",
                 "message": "VitaBot API running"
             }), 200)
-            return add_cors_headers(response, request_origin=request_origin)
+            return response
 
         if path == "/user/profile" and method == "GET":
             response = make_response(jsonify({
@@ -128,59 +87,58 @@ def handler(request: Request):
                     "external_id": external_id
                 }
             }), 200)
-            return add_cors_headers(response, request_origin=request_origin)
+            return response
 
         if path == "/user" and method == "GET":
             external_id_param = data.get("external_id")
             if not external_id_param:
-                return respond({"success": False, "code": 400, "error": "external_id required"}, request_origin=request_origin)
-            return respond(get_user_by_external_id(external_id_param), request_origin=request_origin)
+                return respond({"success": False, "code": 400, "error": "external_id required"})
+            return respond(get_user_by_external_id(external_id_param))
 
         if path == "/user" and method == "POST":
-            return respond(get_or_create_user(data), request_origin=request_origin)
+            return respond(get_or_create_user(data))
 
         if path == "/session" and method == "POST":
-            return respond(create_session({"user_id": db_user_id}), request_origin=request_origin)
+            return respond(create_session({"user_id": db_user_id}))
 
         if path == "/session" and method == "GET":
             session_id = data.get("session_id")
             user_id_param = data.get("user_id")
             if not session_id or not user_id_param:
-                return respond({"success": False, "code": 400, "error": "session_id and user_id required"}, request_origin=request_origin)
+                return respond({"success": False, "code": 400, "error": "session_id and user_id required"})
             # Verificar que el user_id_param coincida con el autenticado
             if str(user_id_param) != str(db_user_id):
-                return respond({"success": False, "code": 403, "error": "Unauthorized to access this session"}, request_origin=request_origin)
+                return respond({"success": False, "code": 403, "error": "Unauthorized to access this session"})
             # Necesito implementar get_session_by_id en sessions.py
             from sessions import get_session_by_id
-            return respond(get_session_by_id(session_id, user_id_param), request_origin=request_origin)
+            return respond(get_session_by_id(session_id, user_id_param))
 
         if path == "/session" and method == "PUT":
-            return respond(update_session_activity(data), request_origin=request_origin)
-
+            return respond(update_session_activity(data))
         if path == "/session" and method == "DELETE":
             logger.info(f"Request to delete session with data: {data}")
-            delete_response = respond(delete_session(data), request_origin=request_origin)
+            delete_response = respond(delete_session(data))
             logger.info(f"Delete session response: {delete_response}")
             return delete_response
 
         if path == "/sessions" and method == "GET":
-            return respond(get_user_sessions(db_user_id), request_origin=request_origin)
+            return respond(get_user_sessions(db_user_id))
 
         if path == "/messages" and method == "GET":
-            return respond(get_messages(data), request_origin=request_origin)
+            return respond(get_messages(data))
 
         if path == "/messages" and method == "POST":
-            return respond(save_messages(data), request_origin=request_origin)
+            return respond(save_messages(data))
 
         if path == "/messages/history" and method == "GET":
-            return respond(get_user_messages(db_user_id), request_origin=request_origin)
+            return respond(get_user_messages(db_user_id))
 
         response = make_response(jsonify({
             "success": False,
             "code": 404,
             "error": f"Ruta no encontrada: {path} [{method}]"
         }), 404)
-        return add_cors_headers(response, request_origin=request_origin)
+        return response
 
     except Exception as e:
         logger.error(str(e))
@@ -189,4 +147,4 @@ def handler(request: Request):
             "code": 500,
             "error": str(e)
         }), 500)
-        return add_cors_headers(response, request_origin=request_origin)
+        return response

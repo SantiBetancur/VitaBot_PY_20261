@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-const SDK_URL = 'https://static.zohocdn.com/catalyst/sdk/js/4.5.0/catalystWebSDK.js'
+const SDK_URL = 'https://static.zohocdn.com/catalyst/sdk/js/4.6.1/catalystWebSDK.js'
 const INIT_URL = '/__catalyst/sdk/init.js'
 
 let sdkLoadPromise = null
@@ -71,4 +71,26 @@ export const useCatalystSDK = () => {
   }, [])
 
   return state
+}
+
+
+let cachedToken = null
+let tokenExpiry = null
+
+export const getAuthToken = async () => {
+  const now = Date.now()
+
+  // Reutiliza el token si aún es válido (con 30s de margen)
+  if (cachedToken && tokenExpiry && now < tokenExpiry - 30_000) {
+    return cachedToken
+  }
+
+  const catalyst = await ensureCatalystSDK()
+  const response = await catalyst.auth.generateAuthToken()
+  
+  cachedToken = response.access_token
+  // Los tokens de Catalyst típicamente duran 1 hora (3600s)
+  tokenExpiry = now + 3600 * 1000
+
+  return cachedToken
 }
