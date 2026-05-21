@@ -14,7 +14,7 @@ const CatalystRegistration = ({ onRegistered, onCancel }) => {
   if (import.meta.env.VITE_ENVIRONMENT === 'development') {
     APP_DOMAIN = import.meta.env.VITE_APP_DOMAIN_DEV
   } else {
-    APP_DOMAIN = import.meta.env.VITE_APP_DOMAIN_PRODUCTION
+    APP_DOMAIN = import.meta.env.VITE_APP_DOMAIN_PRODUCTION || window.location.origin
   }
   useEffect(() => {
     if (sdkError) {
@@ -49,7 +49,7 @@ const CatalystRegistration = ({ onRegistered, onCancel }) => {
       last_name: lastName,
       email_id: email,
       platform_type: 'web',
-      redirect_url: `${APP_DOMAIN}`
+      redirect_url: `${APP_DOMAIN}/`
     }
 
     try {
@@ -58,7 +58,7 @@ const CatalystRegistration = ({ onRegistered, onCancel }) => {
       const signupPromise = auth.signUp(signupData)
       const response = await signupPromise
       console.log('Respuesta del registro:', response)
-      console.log("SIGNUP DATA ENVIADA:", signupData)
+      console.log("SIGNUP DATA ENVIADA:", signupData, "APP_DOMAIN:", APP_DOMAIN) // Verificar el redirect_url enviado
       const userDetails = response?.content || response
       const errorCode = userDetails?.error_code || userDetails?.econtent?.error_code
       const errorMessage = userDetails?.message || userDetails?.econtent?.message || (errorCode && `Error de registro: ${errorCode}`)

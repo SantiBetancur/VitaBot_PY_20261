@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { useChatContext, ACTIONS } from '../context/Chatcontext'
-import { getAuthToken } from './useCatalystSDK'
+import { getAuthUserId } from './useCatalystSDK'
+
 let BACKEND_URL = null
 if (import.meta.env.VITE_ENVIRONMENT === 'development') {
   BACKEND_URL = import.meta.env.VITE_BACKEND_URL_DEV
@@ -8,7 +9,6 @@ if (import.meta.env.VITE_ENVIRONMENT === 'development') {
   BACKEND_URL = import.meta.env.VITE_BACKEND_URL_PRODUCTION
 }
 const URL = `${BACKEND_URL}/server/vitabot_endpoint_function`
-
 
 export function useChat() {
   const { state, dispatch, createChat, getChatById } = useChatContext()
@@ -43,21 +43,20 @@ export function useChat() {
 
     dispatch({ type: ACTIONS.SET_TYPING, payload: true })
 
+    const authUserId = await getAuthUserId()
+
     try {
       const response = await fetch(`${URL}/message`, {
         method: 'POST',
-        credentials: 'include',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${await getAuthToken()}`
-        },
+        // FIX: Content-Type faltaba → el backend no podía parsear el body como JSON
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: trimmed,
           session_id: currentSessionId,
           chat_history: priorMessages.map(({ role, content }) => ({ role, content })),
+          authenticated_user_id: authUserId,
         }),
       })
-      console.log('Response payload:', response)
 
       if (!response.ok) {
         const err = await response.json().catch(() => ({}))

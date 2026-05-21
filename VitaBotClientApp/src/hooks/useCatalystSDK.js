@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-const SDK_URL = 'https://static.zohocdn.com/catalyst/sdk/js/4.6.1/catalystWebSDK.js'
+const SDK_URL = 'https://static.zohocdn.com/catalyst/sdk/js/4.6.2/catalystWebSDK.js'
 const INIT_URL = '/__catalyst/sdk/init.js'
 
 let sdkLoadPromise = null
@@ -74,23 +74,25 @@ export const useCatalystSDK = () => {
 }
 
 
-let cachedToken = null
-let tokenExpiry = null
+export const getAuthUserId = async () => {
+  try {
+    const catalyst = await ensureCatalystSDK()
 
-export const getAuthToken = async () => {
-  const now = Date.now()
+    if (!catalyst || !catalyst.userManagement) {
+      throw new Error(
+        'Catalyst SDK no está disponible para obtener el usuario autenticado.'
+      )
+    }
 
-  // Reutiliza el token si aún es válido (con 30s de margen)
-  if (cachedToken && tokenExpiry && now < tokenExpiry - 30_000) {
-    return cachedToken
+    const response = await catalyst.userManagement.getCurrentProjectUser()
+
+    const userId = response?.content.user_id ?? null
+
+    console.log('Usuario autenticado:', userId, 'Respuesta completa:', response)
+
+    return userId
+  } catch (err) {
+    console.error('Error obteniendo usuario autenticado:', err)
+    return null
   }
-
-  const catalyst = await ensureCatalystSDK()
-  const response = await catalyst.auth.generateAuthToken()
-  
-  cachedToken = response.access_token
-  // Los tokens de Catalyst típicamente duran 1 hora (3600s)
-  tokenExpiry = now + 3600 * 1000
-
-  return cachedToken
 }

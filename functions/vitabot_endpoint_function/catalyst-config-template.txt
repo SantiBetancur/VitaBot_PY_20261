@@ -1,0 +1,21 @@
+{
+	"deployment": {
+		"name": "vitabot_endpoint_function",
+		"stack": "python_3_9",
+		"type": "advancedio",
+		"env_variables": {
+			"OPENAI_API_KEY":"",
+			"CLAUDE_API_KEY":"",
+			"PROJECT_DB_URL":"https://jqvbscenhdydurbwptza.supabase.co",
+			"SECRET_DB_API_KEY":"",
+			"ENVIRONMENT":"production",
+			"BACKEND_URL_PRODUCTION":"https://vitabot-698198575.development.catalystserverless.com",
+			"BACKEND_URL_DEV":"http://localhost:3000",
+			"APP_DOMAIN_PRODCUTION":"https://vitabotclientapp-zpjxkhqj.onslate.com",
+			"APP_DOMAIN_DEV":"localhost:3001"
+		}
+	},
+	"execution": {
+		"main": "main.py"
+	}
+}

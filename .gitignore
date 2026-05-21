@@ -2,3 +2,4 @@
 .env
 /catalyst.json
 __pycache__/
+catalyst-config.json
